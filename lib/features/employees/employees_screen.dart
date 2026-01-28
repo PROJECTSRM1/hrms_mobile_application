@@ -76,7 +76,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
           SizedBox(
             width: 110,
             child: DropdownButtonFormField<String>(
-              value: selectedFilter,
+              initialValue: selectedFilter,
               decoration: InputDecoration(
                 isDense: true,
                 contentPadding:
@@ -169,7 +169,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
       child: DataTable(
         columnSpacing: 28,
         headingRowColor:
-            MaterialStateProperty.all(const Color(0xFFF3F4F6)),
+            WidgetStateProperty.all(const Color(0xFFF3F4F6)),
         columns: const [
           DataColumn(label: Text("EMP ID")),
           DataColumn(label: Text("Name")),

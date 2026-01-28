@@ -12,6 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.delayed(const Duration(seconds: 6), () {
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -24,20 +25,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color.fromARGB(255, 199, 219, 239),
-        child: Center(
-          child: FractionallySizedBox(
-            widthFactor: 1.95,
-            heightFactor: 1.70,
+      body: Stack(
+        children: [
+          /// ================= BACKGROUND IMAGE =================
+          Positioned.fill(
             child: Image.asset(
-              'assets/images/Image.png',
+              'assets/images/background.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          /// ================= CENTER LOGO =================
+          Center(
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 420,
               fit: BoxFit.contain,
             ),
           ),
-        ),
+        ],
       ),
     );
   }

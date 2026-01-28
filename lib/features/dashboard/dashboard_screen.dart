@@ -36,6 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       loading = false;
     });
   } catch (e) {
+    // ignore: avoid_print
     print("LOAD ERROR: $e");
     setState(() => loading = false);
   }

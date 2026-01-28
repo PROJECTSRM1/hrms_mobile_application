@@ -74,7 +74,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       backgroundColor: const Color(0xFFF6F8FB),
       body: Column(
         children: [
-          
+
           /// ================= FROM / TO DATES =================
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -132,6 +132,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         Expanded(
                           child: ListView.separated(
                             itemCount: attendanceData.length,
+                            // ignore: unnecessary_underscores
                             separatorBuilder: (_, __) =>
                                 const Divider(height: 1),
                             itemBuilder: (context, index) =>
