@@ -123,6 +123,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< HEAD
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -130,6 +131,10 @@ packages:
     version: "0.0.0"
   http:
     dependency: transitive
+=======
+  http:
+    dependency: "direct main"
+>>>>>>> 120a34b8c7801f8935459cd6eb12d93d1e73e49c
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -144,6 +149,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+<<<<<<< HEAD
   image:
     dependency: transitive
     description:
@@ -152,6 +158,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.4"
+=======
+>>>>>>> 120a34b8c7801f8935459cd6eb12d93d1e73e49c
   leak_tracker:
     dependency: transitive
     description:
@@ -453,6 +461,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+<<<<<<< HEAD
   xdg_directories:
     dependency: transitive
     description:
@@ -469,6 +478,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
+=======
+>>>>>>> 120a34b8c7801f8935459cd6eb12d93d1e73e49c
 sdks:
   dart: ">=3.10.4 <4.0.0"
   flutter: ">=3.35.0"
