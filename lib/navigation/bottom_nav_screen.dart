@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/employees/employees_screen.dart';
 import '../features/attendance/attendance_screen.dart';
-import '../features/payroll/payroll_screen.dart';
+import '../features/payroll/screens/payroll_screen.dart';
 import '../features/profile/profile_screen.dart';
 
 class BottomNavScreen extends StatefulWidget {
