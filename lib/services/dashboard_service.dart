@@ -1,53 +1,51 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'auth_service.dart';
 import '../models/dashboard_models.dart';
 
 class DashboardService {
-  static const String baseUrl = "https://hrms-be-ppze.onrender.com/";
+  static const String baseUrl = "https://hrms-be-ppze.onrender.com";
 
   static Future<DashboardData?> getDashboardSummary() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/dashboard/summary"),
-        headers: {
-          "Content-Type": "application/json",
-          // "Authorization": "Bearer YOUR_TOKEN", // if needed
-        },
-      );
+    final token = await AuthService.getToken();
 
-      print("DASHBOARD STATUS: ${response.statusCode}");
-      print("DASHBOARD BODY: ${response.body}");
+    if (token == null) return null;
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        return DashboardData.fromJson(json);
-      }
-      return null;
-    } catch (e) {
-      print("DASHBOARD ERROR: $e");
-      return null;
+    final response = await http.get(
+      Uri.parse("$baseUrl/dashboard/summary"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return DashboardData.fromJson(jsonDecode(response.body));
     }
+
+    return null;
   }
 
   static Future<List<Activity>> getRecentActivities() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/dashboard/recent-activities"),
-      );
+    final token = await AuthService.getToken();
 
-      print("ACTIVITY STATUS: ${response.statusCode}");
-      print("ACTIVITY BODY: ${response.body}");
+    if (token == null) return [];
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        return (json['activities'] as List)
-            .map((e) => Activity.fromJson(e))
-            .toList();
-      }
-      return [];
-    } catch (e) {
-      print("ACTIVITY ERROR: $e");
-      return [];
+    final response = await http.get(
+      Uri.parse("$baseUrl/dashboard/recent-activities"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return (json["activities"] as List)
+          .map((e) => Activity.fromJson(e))
+          .toList();
     }
+
+    return [];
   }
 }

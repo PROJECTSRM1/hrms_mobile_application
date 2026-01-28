@@ -22,12 +22,16 @@ class HrmsAppBar extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SafeArea(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start, // 👈 helps top control
           children: [
             /// LOGO
-            Image.asset(
-              'assets/images/white.png',
-              height: 68,
-              fit: BoxFit.contain,
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Image.asset(
+                'assets/images/white.png',
+                height: 88,
+                fit: BoxFit.contain,
+              ),
             ),
 
             const SizedBox(width: 12),
@@ -36,6 +40,7 @@ class HrmsAppBar extends StatelessWidget implements PreferredSizeWidget {
             Expanded(
               child: Container(
                 height: 42,
+                margin: const EdgeInsets.only(top: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -57,31 +62,35 @@ class HrmsAppBar extends StatelessWidget implements PreferredSizeWidget {
             const SizedBox(width: 12),
 
             /// NOTIFICATION ICON
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {},
-                ),
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.notifications_none,
+                      color: Colors.white,
                     ),
-                    child: const Text(
-                      "4",
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                    onPressed: () {},
+                  ),
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Text(
+                        "4",
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 10),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
