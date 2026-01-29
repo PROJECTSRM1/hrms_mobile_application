@@ -1,8 +1,26 @@
 import 'package:flutter/material.dart';
 import '../../common/widgets/hrms_app_bar.dart';
+import '../../screens/task_management/create_task_screen.dart';
+import '../../screens/task_management/assign_task_screen.dart';
+import '../../screens/task_management/task_board_screen.dart';
+import '../../screens/task_management/task_history_screen.dart';
+import '../../screens/leave_management/create_leave_screen.dart';
+import '../../screens/leave_management/leave_balance_screen.dart';
+import '../../screens/leave_management/leave_calendar_screen.dart';
+import '../../screens/leave_management/my_approvals_screen.dart';
+import '../../screens/leave_management/holiday_calendar_screen.dart';
+import '../../screens/salary/create_payslips_screen.dart';
+import '../../screens/salary/salary_revision_screen.dart';
+import '../../screens/performance/performance_screen.dart';
+import '../../screens/recruiting/recruiting_screen.dart';
+import '../../screens/configuration/configuration_screen.dart';
+import '../../screens/reports/reports_screen.dart';
+import '../../screens/analytics/analytics_screen.dart';
+import '../../screens/access_management/access_management_screen.dart';
+import '../../screens/settings/settings_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class MoreScreen extends StatelessWidget {
+  const MoreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +41,8 @@ class ProfileScreen extends StatelessWidget {
               children: const [
                 CircleAvatar(
                   radius: 28,
-                  child: Icon(Icons.person, size: 32),
+                  backgroundColor: Color(0xFF0AA6B7),
+                  child: Icon(Icons.person, size: 32, color: Colors.white),
                 ),
                 SizedBox(width: 12),
                 Column(
@@ -51,44 +70,47 @@ class ProfileScreen extends StatelessWidget {
 
           /// ================= MODULES =================
           _expandableCard(
+            context: context,
             icon: Icons.task_alt,
             title: "Task Management",
             children: [
-              _subItem("Create Task"),
-              _subItem("Assign Task"),
-              _subItem("Task Board"),
-              _subItem("Task History"),
+              _subItem(context, "Create Task", () => const CreateTaskScreen()),
+              _subItem(context, "Assign Task", () => const AssignTaskScreen()),
+              _subItem(context, "Task Board", () => const TaskBoardScreen()),
+              _subItem(context, "Task History", () => const TaskHistoryScreen()),
             ],
           ),
 
           _expandableCard(
+            context: context,
             icon: Icons.event_note,
             title: "Leave Management",
             children: [
-              _subItem("Create / Apply Leave"),
-              _subItem("Leave Balance"),
-              _subItem("Leave Calendar"),
-              _subItem("My Approvals"),
-              _subItem("Holiday Calendar"),
+              _subItem(context, "Create / Apply Leave", () => const CreateLeaveScreen()),
+              _subItem(context, "Leave Balance", () => const LeaveBalanceScreen()),
+              _subItem(context, "Leave Calendar", () => const LeaveCalendarScreen()),
+              _subItem(context, "My Approvals", () => const MyApprovalsScreen()),
+              _subItem(context, "Holiday Calendar", () => const HolidayCalendarScreen()),
             ],
           ),
 
           _expandableCard(
+            context: context,
             icon: Icons.payments,
             title: "Salary",
             children: [
-              _subItem("Create Payslips"),
-              _subItem("Salary Revision"),
+              _subItem(context, "Create Payslips", () => const CreatePayslipsScreen()),
+              _subItem(context, "Salary Revision", () => const SalaryRevisionScreen()),
             ],
           ),
 
-          _simpleCard(Icons.trending_up, "Performance"),
-          _simpleCard(Icons.group_add, "Recruiting"),
-          _simpleCard(Icons.settings_suggest, "Configuration"),
-          _simpleCard(Icons.bar_chart, "Reports"),
-          _simpleCard(Icons.analytics, "Analytics"),
-          _simpleCard(Icons.lock_outline, "Access Management"),
-          _simpleCard(Icons.settings, "Settings"),
+          _simpleCard(context, Icons.trending_up, "Performance", () => const PerformanceScreen()),
+          _simpleCard(context, Icons.group_add, "Recruiting", () => const RecruitingScreen()),
+          _simpleCard(context, Icons.settings_suggest, "Configuration", () => const ConfigurationScreen()),
+          _simpleCard(context, Icons.bar_chart, "Reports", () => const ReportsScreen()),
+          _simpleCard(context, Icons.analytics, "Analytics", () => const AnalyticsScreen()),
+          _simpleCard(context, Icons.lock_outline, "Access Management", () => const AccessManagementScreen()),
+          _simpleCard(context, Icons.settings, "Settings", () => const SettingsScreen()),
 
           const SizedBox(height: 8),
 
@@ -109,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // handle logout
+                _showLogoutDialog(context);
               },
             ),
           ),
@@ -120,6 +142,7 @@ class ProfileScreen extends StatelessWidget {
 
   /// ================= EXPANDABLE CARD =================
   static Widget _expandableCard({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required List<Widget> children,
@@ -142,16 +165,21 @@ class ProfileScreen extends StatelessWidget {
   }
 
   /// ================= SUB ITEM =================
-  static Widget _subItem(String title) {
+  static Widget _subItem(BuildContext context, String title, Widget Function() screenBuilder) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 56, right: 16),
       title: Text(title),
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screenBuilder()),
+        );
+      },
     );
   }
 
   /// ================= SIMPLE CARD =================
-  static Widget _simpleCard(IconData icon, String title) {
+  static Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screenBuilder) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -164,8 +192,42 @@ class ProfileScreen extends StatelessWidget {
           title,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => screenBuilder()),
+          );
+        },
       ),
+    );
+  }
+
+  /// ================= LOGOUT DIALOG =================
+  static void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Implement logout logic here
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
