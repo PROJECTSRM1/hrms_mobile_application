@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/employees/employees_screen.dart';
 import '../features/attendance/attendance_screen.dart';
-import '../features/payroll/screens/payroll_screen.dart';
-import '../features/profile/profile_screen.dart';
+import '../features/payroll/payroll_screen.dart';
+import '../features/more/more.dart';
 
 class BottomNavScreen extends StatefulWidget {
   const BottomNavScreen({super.key});
@@ -40,7 +40,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.people), label: "Employees"),
           BottomNavigationBarItem(icon: Icon(Icons.access_time), label: "Attendance"),
           BottomNavigationBarItem(icon: Icon(Icons.payments), label: "Payroll"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: "More"),
         ],
       ),
     );

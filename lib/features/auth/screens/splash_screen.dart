@@ -35,12 +35,15 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ),
 
-          /// ================= CENTER LOGO =================
+          /// ================= LARGE RESPONSIVE LOGO =================
           Center(
-            child: Image.asset(
-              'assets/images/logo.png',
-              width: 420,
-              fit: BoxFit.contain,
+            child: FractionallySizedBox(
+              widthFactor: 0.95,   // 👈 almost full width
+              heightFactor: 0.95,  // 👈 almost full height
+              child: Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ],

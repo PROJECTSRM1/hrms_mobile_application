@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../common/widgets/hrms_app_bar.dart';
+import '../../common/widgets/hrms_app_bar.dart';
 
 class PayrollScreen extends StatelessWidget {
   const PayrollScreen({super.key});
