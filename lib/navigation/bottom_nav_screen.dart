@@ -5,6 +5,7 @@ import '../features/attendance/attendance_screen.dart';
 import '../features/payroll/payroll_screen.dart';
 import '../features/more/more.dart';
 
+
 class BottomNavScreen extends StatefulWidget {
   const BottomNavScreen({super.key});
 
@@ -20,7 +21,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
     EmployeesScreen(),
     AttendanceScreen(),
     PayrollScreen(),
-    ProfileScreen(),
+    MoreScreen(),
   ];
 
   @override
@@ -30,17 +31,34 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
+        selectedItemColor: const Color(0xFF0AA6B7),
+        unselectedItemColor: Colors.grey,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: "Employees"),
-          BottomNavigationBarItem(icon: Icon(Icons.access_time), label: "Attendance"),
-          BottomNavigationBarItem(icon: Icon(Icons.payments), label: "Payroll"),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: "More"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: "Dashboard",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: "Employees",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_time),
+            label: "Attendance",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.payments),
+            label: "Payroll",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: "More",
+          ),
         ],
       ),
     );
