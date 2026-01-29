@@ -13,7 +13,11 @@ class EmployeeDetailsScreen extends StatefulWidget {
 
 class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   bool isLoading = true;
+  bool isEditMode = false;
+
   Map<String, dynamic>? employee;
+  final Map<String, dynamic> payload = {};
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -34,6 +38,32 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     }
   }
 
+  Future<void> _saveChanges() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await EmployeeService.updateEmployee(
+        widget.employeeId,
+        payload,
+      );
+
+      setState(() {
+        isEditMode = false;
+        payload.clear();
+      });
+
+      _loadEmployee();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Employee updated successfully")),
+      );
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Update failed")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,37 +73,61 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : employee == null
               ? const Center(child: Text("Employee not found"))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _editButton(),
-                      _headerCard(),
-                      _personalDetails(),
-                      _jobDetails(),
-                      _familyDetails(),
-                    ],
+              : Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _editControls(),
+                        _headerCard(),
+                        _personalDetails(),
+                        _jobDetails(),
+                        _familyDetails(),
+                      ],
+                    ),
                   ),
                 ),
     );
   }
 
-  // ================= EDIT =================
-  Widget _editButton() {
+  // ================= EDIT CONTROLS =================
+  Widget _editControls() {
     return Align(
       alignment: Alignment.centerRight,
-      child: TextButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.edit, color: Colors.deepPurple),
-        label: const Text(
-          "Edit Details",
-          style: TextStyle(
-            color: Colors.deepPurple,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+      child: isEditMode
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isEditMode = false;
+                      payload.clear();
+                    });
+                  },
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: _saveChanges,
+                  child: const Text("Save"),
+                ),
+              ],
+            )
+          : TextButton.icon(
+              onPressed: () {
+                setState(() => isEditMode = true);
+              },
+              icon: const Icon(Icons.edit, color: Colors.deepPurple),
+              label: const Text(
+                "Edit Details",
+                style: TextStyle(
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
     );
   }
 
@@ -83,7 +137,10 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       color: const Color(0xFFF3EDFF),
       child: Row(
         children: [
-          const CircleAvatar(radius: 26, backgroundColor: Colors.deepPurple),
+          const CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.deepPurple,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -121,14 +178,16 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       title: "Personal Details",
       color: const Color(0xFFF8F4FF),
       children: [
-        _field("Email", employee!['email']),
-        _field("Phone", employee!['mobile']),
-        _field("Date of Birth", employee!['date_of_birth']),
-        _field("Gender", _gender()),
-        _field("Marital Status", _marital()),
-        _field("Blood Group", employee!['blood_group_id']),
-        _field("Present Address", employee!['present_address']),
-        _field("Permanent Address", employee!['permanent_address']),
+        _field("Email", "email", employee!['email']),
+        _field("Phone", "mobile", employee!['mobile']),
+        _field("Date of Birth", "date_of_birth", employee!['date_of_birth']),
+        _field("Gender", "gender_id", _gender()),
+        _field("Marital Status", "marital_status_id", _marital()),
+        _field("Blood Group", "blood_group_id", employee!['blood_group_id']),
+        _field("Present Address", "present_address",
+            employee!['present_address']),
+        _field("Permanent Address", "permanent_address",
+            employee!['permanent_address']),
       ],
     );
   }
@@ -139,27 +198,29 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       title: "Job Details",
       color: const Color(0xFFEFF6FF),
       children: [
-        _field("Employee ID", employee!['emp_code']),
-        _field("Department", employee!['department_id']),
-        _field("Designation", employee!['designation_id']),
+        _field("Employee ID", "emp_code", employee!['emp_code']),
+        _field("Department", "department_id", employee!['department_id']),
+        _field("Designation", "designation_id", employee!['designation_id']),
         _field(
           "Employee Type",
+          "employee_type_id",
           employee!['employee_type_id'] == 2 ? "Contract" : "Regular",
         ),
-        _field("Work Location", employee!['work_location_id']),
-        _field("Shift", employee!['shift_id'] == 1 ? "Day" : "Night"),
-        _field("Reporting Manager", employee!['manager_id']),
-        _field("Join Date", employee!['join_date']),
-        _field("Probation End", employee!['probation_end_date']),
-        _field(
-          "Status",
-          employee!['is_active'] == true ? "Active" : "Inactive",
-        ),
-        _field("UAN", employee!['uan']),
-        _field("PAN", employee!['pan']),
-        _field("Bank Account", employee!['bank_ac_no']),
-        _field("Aadhaar", employee!['aadhaar']),
-        _field("IFSC Code", employee!['ifsc_code']),
+        _field("Work Location", "work_location_id",
+            employee!['work_location_id']),
+        _field("Shift", "shift_id",
+            employee!['shift_id'] == 1 ? "Day" : "Night"),
+        _field("Reporting Manager", "manager_id", employee!['manager_id']),
+        _field("Join Date", "join_date", employee!['join_date']),
+        _field("Probation End", "probation_end_date",
+            employee!['probation_end_date']),
+        _field("Status", "is_active",
+            employee!['is_active'] == true ? "Active" : "Inactive"),
+        _field("UAN", "uan", employee!['uan']),
+        _field("PAN", "pan", employee!['pan']),
+        _field("Bank Account", "bank_ac_no", employee!['bank_ac_no']),
+        _field("Aadhaar", "aadhaar", employee!['aadhaar']),
+        _field("IFSC Code", "ifsc_code", employee!['ifsc_code']),
       ],
     );
   }
@@ -174,34 +235,30 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       children: family.isEmpty
           ? [const Text("No family details available")]
           : family.asMap().entries.expand((entry) {
-              final i = entry.key + 1;
               final fm = entry.value;
-
               return [
-                Text(
-                  "Member $i",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _field("Relation", fm['relation_id']),
+                _field("Relation", null, fm['relation_id'], editable: false),
                 _field(
                     "Name",
-                    "${fm['first_name']} ${fm['last_name']}"),
-                _field("Date of Birth", fm['date_of_birth']),
-                _field("Occupation", fm['occupation_id']),
-                _field("Phone", fm['phone']),
-                _field("Email", fm['email']),
-                _field("Bank Account", fm['bank_account']),
-                _field("IFSC", fm['ifsc_code']),
-                _field("PAN", fm['pan']),
-                _field("Aadhaar", fm['aadhar']),
-                _field("Present Address", fm['present_address']),
-                _field("Permanent Address", fm['permanent_address']),
-                if (i != family.length)
-                  const Divider(height: 32),
+                    null,
+                    "${fm['first_name']} ${fm['last_name']}",
+                    editable: false),
+                _field("Date of Birth", null, fm['date_of_birth'],
+                    editable: false),
+                _field("Occupation", null, fm['occupation_id'],
+                    editable: false),
+                _field("Phone", null, fm['phone'], editable: false),
+                _field("Email", null, fm['email'], editable: false),
+                _field("Bank Account", null, fm['bank_account'],
+                    editable: false),
+                _field("IFSC", null, fm['ifsc_code'], editable: false),
+                _field("PAN", null, fm['pan'], editable: false),
+                _field("Aadhaar", null, fm['aadhar'], editable: false),
+                _field("Present Address", null, fm['present_address'],
+                    editable: false),
+                _field("Permanent Address", null, fm['permanent_address'],
+                    editable: false),
+                const Divider(height: 32),
               ];
             }).toList(),
     );
@@ -231,11 +288,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
+          Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           ...children,
         ],
@@ -243,24 +298,40 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     );
   }
 
-  Widget _field(String label, dynamic value) {
+  Widget _field(
+    String label,
+    String? keyName,
+    dynamic value, {
+    bool editable = true,
+  }) {
+    if (!isEditMode || !editable) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style:
+                    const TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 6),
+            Text(
+              value?.toString() ?? "-",
+              style: const TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style:
-                  const TextStyle(fontSize: 12, color: Colors.grey)),
-          const SizedBox(height: 6),
-          Text(
-            value?.toString() ?? "-",
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+      child: TextFormField(
+        initialValue: value?.toString(),
+        decoration: InputDecoration(labelText: label),
+        onChanged: (v) {
+          if (keyName != null) payload[keyName] = v;
+        },
       ),
     );
   }

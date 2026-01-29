@@ -55,4 +55,24 @@ class EmployeeService {
       );
     }
   }
+
+  /// ================= UPDATE EMPLOYEE =================
+  static Future<void> updateEmployee(
+    String employeeId,
+    Map<String, dynamic> payload,
+  ) async {
+    final res = await http.put(
+      Uri.parse('$_baseUrl/employees/$employeeId'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (res.statusCode != 200) {
+      throw Exception(
+        'Failed to update employee: ${res.body}',
+      );
+    }
+  }
 }

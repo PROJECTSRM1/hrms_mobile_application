@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'designations_screen.dart';
+
 
 class ConfigurationScreen extends StatelessWidget {
   const ConfigurationScreen({super.key});
@@ -16,40 +18,48 @@ class ConfigurationScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _buildCard(
-            icon: Icons.business,
-            title: 'Company Settings',
-            subtitle: 'Configure company information',
-            onTap: () {},
+            icon: Icons.apartment,
+            title: 'Departments',
+            subtitle: 'Create and manage departments',
+            onTap: () {
+              // Navigate to Departments screen
+            },
           ),
           _buildCard(
-            icon: Icons.account_tree,
-            title: 'Department Management',
-            subtitle: 'Manage departments and hierarchy',
-            onTap: () {},
+            icon: Icons.badge,
+            title: 'Designations',
+            subtitle: 'Manage job designations',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DesignationsScreen()),
+              );
+            },
+          ),
+
+          _buildCard(
+            icon: Icons.people_outline,
+            title: 'Roles',
+            subtitle: 'Configure system roles & permissions',
+            onTap: () {
+              // Navigate to Roles screen
+            },
           ),
           _buildCard(
-            icon: Icons.work_outline,
-            title: 'Designation Setup',
-            subtitle: 'Configure job designations',
-            onTap: () {},
+            icon: Icons.layers_outlined,
+            title: 'Interview Stages',
+            subtitle: 'Define interview workflow stages',
+            onTap: () {
+              // Navigate to Interview Stages screen
+            },
           ),
           _buildCard(
-            icon: Icons.schedule,
-            title: 'Work Schedules',
-            subtitle: 'Set up work shifts and timings',
-            onTap: () {},
-          ),
-          _buildCard(
-            icon: Icons.category,
-            title: 'Leave Types',
-            subtitle: 'Configure leave categories',
-            onTap: () {},
-          ),
-          _buildCard(
-            icon: Icons.currency_rupee,
-            title: 'Salary Components',
-            subtitle: 'Define salary structure',
-            onTap: () {},
+            icon: Icons.assignment_outlined,
+            title: 'Projects',
+            subtitle: 'Manage company projects',
+            onTap: () {
+              // Navigate to Projects screen
+            },
           ),
         ],
       ),
@@ -80,10 +90,7 @@ class ConfigurationScreen extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
