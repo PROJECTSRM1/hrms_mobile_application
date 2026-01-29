@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../common/widgets/hrms_app_bar.dart';
+import '../../models/employee_model.dart';
+import '../../services/employee_service.dart';
+import 'add_employee_screen.dart';
+import 'employee_details_screen.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -13,25 +17,34 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
   String selectedFilter = "All";
   bool isGridView = false;
+  bool isLoading = true;
 
-  /// ================= STATIC DATA =================
-  final List<Employee> employees = [
-    Employee("Ramudu P", "EMP001", "Non-IT", "Other", "8765432123", true),
-    Employee("Burra Pavan", "EMP111", "Non-IT", "Employee", "1234567890", true),
-    Employee("Mahesh Kesani", "EMP105", "IT", "Employee", "9870543210", true),
-    Employee("Radha Sharma", "EMP041", "IT", "Employee", "9988776655", false),
-    Employee("Ramesh", "EMP003", "IT", "Other", "8765430123", true),
-    Employee("Virat Kohli", "EMP101", "IT", "Employee", "1234537890", false),
-    Employee("Hardik Pandya", "EMP135", "IT", "Employee", "9870513210", true),
-    Employee("Abhishek Sharma", "EMP024", "IT", "Employee", "998872355", false),
-  ];
+  List<Employee> employees = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadEmployees();
+  }
+
+  Future<void> loadEmployees() async {
+    try {
+      final data = await EmployeeService.fetchEmployees();
+      setState(() {
+        employees = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Employee Load Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
 
   /// ================= FILTER =================
   List<Employee> get filteredEmployees {
     return employees.where((emp) {
-      final matchesSearch = emp.name
-          .toLowerCase()
-          .contains(_searchController.text.toLowerCase());
+      final matchesSearch =
+          emp.name.toLowerCase().contains(_searchController.text.toLowerCase());
 
       final matchesFilter = selectedFilter == "All"
           ? true
@@ -48,31 +61,29 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7FB),
       appBar: const HrmsAppBar(),
-
       body: Column(
         children: [
           _buildControlsRow(),
           _buildSearchBar(),
-
           Expanded(
-            child: isGridView ? _buildTableView() : _buildListView(),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : isGridView
+                    ? _buildTableView()
+                    : _buildListView(),
           ),
         ],
       ),
     );
   }
 
-  /// =====================================================
-  /// CONTROLS ROW (FIXED DROPDOWN HERE)
-  /// =====================================================
+  /// ================= CONTROLS ROW =================
   Widget _buildControlsRow() {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Row(
         children: [
-
-          /// ✅ FIXED DROPDOWN (FormField version)
           SizedBox(
             width: 110,
             child: DropdownButtonFormField<String>(
@@ -96,11 +107,21 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               onChanged: (v) => setState(() => selectedFilter = v!),
             ),
           ),
-
           const Spacer(),
-
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AddEmployeeScreen(),
+                ),
+              );
+
+              if (result == true) {
+                setState(() => isLoading = true);
+                loadEmployees();
+              }
+            },
             icon: const Icon(Icons.add),
             label: const Text("Add Employee"),
             style: ElevatedButton.styleFrom(
@@ -112,9 +133,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               ),
             ),
           ),
-
           const SizedBox(width: 10),
-
           OutlinedButton(
             onPressed: () => setState(() => isGridView = !isGridView),
             style: OutlinedButton.styleFrom(
@@ -157,7 +176,20 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
       padding: const EdgeInsets.all(16),
       itemCount: filteredEmployees.length,
       itemBuilder: (_, index) {
-        return EmployeeCard(employee: filteredEmployees[index]);
+        final emp = filteredEmployees[index];
+
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    EmployeeDetailsScreen(employeeId: emp.id)
+              ),
+            );
+          },
+          child: EmployeeCard(employee: emp),
+        );
       },
     );
   }
@@ -179,39 +211,37 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
           DataColumn(label: Text("Status")),
         ],
         rows: filteredEmployees.map((e) {
-          return DataRow(cells: [
-            DataCell(Text(e.empId)),
-            DataCell(Text(e.name)),
-            DataCell(Text(e.department)),
-            DataCell(Text(e.role)),
-            DataCell(Text(e.phone)),
-            DataCell(
-              Text(
-                e.isActive ? "Active" : "Inactive",
-                style: TextStyle(
-                  color: e.isActive ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.bold,
+          return DataRow(
+            onSelectChanged: (_) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      EmployeeDetailsScreen(employeeId: e.empId),
+                ),
+              );
+            },
+            cells: [
+              DataCell(Text(e.empId)),
+              DataCell(Text(e.name)),
+              DataCell(Text(e.department)),
+              DataCell(Text(e.role)),
+              DataCell(Text(e.phone)),
+              DataCell(
+                Text(
+                  e.isActive ? "Active" : "Inactive",
+                  style: TextStyle(
+                    color: e.isActive ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-          ]);
+            ],
+          );
         }).toList(),
       ),
     );
   }
-}
-
-/// ================= MODEL =================
-class Employee {
-  final String name;
-  final String empId;
-  final String department;
-  final String role;
-  final String phone;
-  final bool isActive;
-
-  Employee(this.name, this.empId, this.department, this.role, this.phone,
-      this.isActive);
 }
 
 /// ================= CARD =================
