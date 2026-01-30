@@ -54,10 +54,12 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
 
       _loadEmployee();
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Employee updated successfully")),
       );
     } catch (_) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Update failed")),
       );

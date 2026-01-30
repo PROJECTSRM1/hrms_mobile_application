@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'departments_screen.dart';
 import 'designations_screen.dart';
-
+import 'roles_screen.dart';
+import 'interview_stages_screen.dart';
+import 'projects_screen.dart';
 
 class ConfigurationScreen extends StatelessWidget {
   const ConfigurationScreen({super.key});
@@ -10,9 +13,22 @@ class ConfigurationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
-        title: const Text('Configuration'),
-        backgroundColor: const Color(0xFF0AA6B7),
+        title: const Text("Config"),
         foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 1,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF0F4C5C),
+                Color(0xFF0AA6B7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -22,7 +38,12 @@ class ConfigurationScreen extends StatelessWidget {
             title: 'Departments',
             subtitle: 'Create and manage departments',
             onTap: () {
-              // Navigate to Departments screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DepartmentsScreen(),
+                ),
+              );
             },
           ),
           _buildCard(
@@ -32,17 +53,23 @@ class ConfigurationScreen extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const DesignationsScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const DesignationsScreen(),
+                ),
               );
             },
           ),
-
           _buildCard(
             icon: Icons.people_outline,
             title: 'Roles',
             subtitle: 'Configure system roles & permissions',
             onTap: () {
-              // Navigate to Roles screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const RolesScreen(),
+                ),
+              );
             },
           ),
           _buildCard(
@@ -50,7 +77,12 @@ class ConfigurationScreen extends StatelessWidget {
             title: 'Interview Stages',
             subtitle: 'Define interview workflow stages',
             onTap: () {
-              // Navigate to Interview Stages screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const InterviewStagesScreen(),
+                ),
+              );
             },
           ),
           _buildCard(
@@ -58,7 +90,12 @@ class ConfigurationScreen extends StatelessWidget {
             title: 'Projects',
             subtitle: 'Manage company projects',
             onTap: () {
-              // Navigate to Projects screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProjectsScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -86,11 +123,17 @@ class ConfigurationScreen extends StatelessWidget {
             color: const Color(0xFF0AA6B7).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: const Color(0xFF0AA6B7)),
+          child: Icon(
+            icon,
+            color: const Color(0xFF0AA6B7),
+          ),
         ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),

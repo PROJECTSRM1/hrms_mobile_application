@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../navigation/bottom_nav_screen.dart';
-import '../../../services/auth_service.dart';
+import '../../navigation/bottom_nav_screen.dart';
+import '../../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
