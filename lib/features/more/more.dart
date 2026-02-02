@@ -9,6 +9,8 @@ import '../../screens/leave_management/leave_balance_screen.dart';
 import '../../screens/leave_management/leave_calendar_screen.dart';
 import '../../screens/leave_management/my_approvals_screen.dart';
 import '../../screens/leave_management/holiday_calendar_screen.dart';
+import '../../screens/leave_management/pending_leave_screen.dart';
+import '../../screens/leave_management/leave_history_screen.dart';
 import '../../screens/salary/create_payslips_screen.dart';
 import '../../screens/salary/salary_revision_screen.dart';
 import '../../screens/performance/performance_screen.dart';
@@ -50,16 +52,10 @@ class MoreScreen extends StatelessWidget {
                   children: [
                     Text(
                       "Mahesh Kesani",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 4),
-                    Text(
-                      "HR Manager",
-                      style: TextStyle(color: Colors.grey),
-                    ),
+                    Text("HR Manager", style: TextStyle(color: Colors.grey)),
                   ],
                 )
               ],
@@ -86,7 +82,7 @@ class MoreScreen extends StatelessWidget {
             icon: Icons.event_note,
             title: "Leave Management",
             children: [
-              _subItem(context, "Create / Apply Leave", () => const CreateLeaveScreen()),
+              _leaveDropdown(context), // ✅ ONLY CHANGE HERE
               _subItem(context, "Leave Balance", () => const LeaveBalanceScreen()),
               _subItem(context, "Leave Calendar", () => const LeaveCalendarScreen()),
               _subItem(context, "My Approvals", () => const MyApprovalsScreen()),
@@ -114,7 +110,7 @@ class MoreScreen extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          /// ================= LOGOUT (SCROLLABLE) =================
+          /// ================= LOGOUT =================
           Container(
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
@@ -125,14 +121,9 @@ class MoreScreen extends StatelessWidget {
               leading: const Icon(Icons.logout, color: Colors.redAccent),
               title: const Text(
                 "Logout",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.redAccent,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, color: Colors.redAccent),
               ),
-              onTap: () {
-                _showLogoutDialog(context);
-              },
+              onTap: () => _showLogoutDialog(context),
             ),
           ),
         ],
@@ -140,7 +131,60 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  /// ================= EXPANDABLE CARD =================
+  /// ================= LEAVE DROPDOWN =================
+  static Widget _leaveDropdown(BuildContext context) {
+    String value = "Apply";
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Padding(
+          padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Create / Apply Leave"),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                  color: const Color(0xFFF6F8FB),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: value,
+                    isExpanded: true,
+                    items: const [
+                      DropdownMenuItem(value: "Apply", child: Text("Apply Leave")),
+                      DropdownMenuItem(value: "Pending", child: Text("Pending Leaves")),
+                      DropdownMenuItem(value: "History", child: Text("Leave History")),
+                    ],
+                    onChanged: (v) {
+                      setState(() => value = v!);
+
+                      if (v == "Apply") {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const ApplyLeaveScreen()));
+                      } else if (v == "Pending") {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const PendingLeaveScreen()));
+                      } else {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const LeaveHistoryScreen()));
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// ================= HELPERS =================
   static Widget _expandableCard({
     required BuildContext context,
     required IconData icon,
@@ -149,85 +193,49 @@ class MoreScreen extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
       child: ExpansionTile(
         leading: Icon(icon, color: const Color(0xFF0AA6B7)),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         children: children,
       ),
     );
   }
 
-  /// ================= SUB ITEM =================
-  static Widget _subItem(BuildContext context, String title, Widget Function() screenBuilder) {
+  static Widget _subItem(BuildContext context, String title, Widget Function() screen) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 56, right: 16),
       title: Text(title),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => screenBuilder()),
-        );
-      },
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen())),
     );
   }
 
-  /// ================= SIMPLE CARD =================
-  static Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screenBuilder) {
+  static Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screen) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF0AA6B7)),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screenBuilder()),
-          );
-        },
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen())),
       ),
     );
   }
 
-  /// ================= LOGOUT DIALOG =================
   static void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Implement logout logic here
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.redAccent),
-              ),
-            ),
-          ],
-        );
-      },
+      builder: (_) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
     );
   }
 }
