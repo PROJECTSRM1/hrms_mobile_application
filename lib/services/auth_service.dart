@@ -47,38 +47,34 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final res = await http.post(
-      Uri.parse("$baseUrl/auth/login"),
-      headers: await _headers(auth: false),
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/auth/login"),
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "application/json",
+        },
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+        }),
+      );
 
-    if (res.statusCode == 200) {
-      final data = jsonDecode(res.body);
-      await _saveToken(data["token"]);
-      return true;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data["token"];
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("auth_token", token);
+
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      print('Login error: $e');
+      return false;
     }
-
-    return false;
-  }
-
-  /* ===================== PROFILE ===================== */
-
-  /// GET /auth/me
-  static Future<Map<String, dynamic>> getProfile() async {
-    final res = await http.get(
-      Uri.parse("$baseUrl/auth/me"),
-      headers: await _headers(),
-    );
-
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body);
-    }
-
-    throw Exception("Unable to fetch profile");
   }
 
   /// PUT /auth/me
@@ -121,5 +117,10 @@ class AuthService {
     );
 
     return res.statusCode == 200;
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
   }
 }
