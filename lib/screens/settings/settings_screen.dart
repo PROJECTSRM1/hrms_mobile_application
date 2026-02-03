@@ -1,242 +1,138 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../theme/theme_provider.dart';
+import 'profile_settings_screen.dart';
+import 'change_password_screen.dart';
+import 'about_app_screen.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _emailNotifications = true;
-  bool _darkMode = false;
-
-  @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: const Color(0xFF0AA6B7),
+        title: const Text("Settings"),
         foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0F4C5C), Color(0xFF0AA6B7)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'GENERAL',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+          _section("GENERAL"),
+          _card([
+            _tile(
+              icon: Icons.person,
+              title: "Profile Settings",
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProfileSettingsScreen(),
+                ),
               ),
             ),
-          ),
-          _buildCard(
-            child: Column(
-              children: [
-                _buildSettingTile(
-                  icon: Icons.person,
-                  title: 'Profile Settings',
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingTile(
-                  icon: Icons.language,
-                  title: 'Language',
-                  trailing: const Text('English'),
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingTile(
-                  icon: Icons.access_time,
-                  title: 'Time Zone',
-                  trailing: const Text('IST (GMT+5:30)'),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'NOTIFICATIONS',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          _buildCard(
-            child: Column(
-              children: [
-                _buildSwitchTile(
-                  icon: Icons.notifications,
-                  title: 'Push Notifications',
-                  value: _notificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                    });
-                  },
-                ),
-                const Divider(height: 1),
-                _buildSwitchTile(
-                  icon: Icons.email,
-                  title: 'Email Notifications',
-                  value: _emailNotifications,
-                  onChanged: (value) {
-                    setState(() {
-                      _emailNotifications = value;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'APPEARANCE',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          _buildCard(
-            child: _buildSwitchTile(
+          ]),
+
+          const SizedBox(height: 20),
+          _section("APPEARANCE"),
+          _card([
+            _switchTile(
               icon: Icons.dark_mode,
-              title: 'Dark Mode',
-              value: _darkMode,
-              onChanged: (value) {
-                setState(() {
-                  _darkMode = value;
-                });
-              },
+              title: "Dark Mode",
+              value: themeProvider.isDarkMode,
+              onChanged: themeProvider.toggleTheme,
             ),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'SECURITY',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+          ]),
+
+          const SizedBox(height: 20),
+          _section("SECURITY"),
+          _card([
+            _tile(
+              icon: Icons.lock,
+              title: "Change Password",
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
               ),
             ),
-          ),
-          _buildCard(
-            child: Column(
-              children: [
-                _buildSettingTile(
-                  icon: Icons.lock,
-                  title: 'Change Password',
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingTile(
-                  icon: Icons.fingerprint,
-                  title: 'Biometric Authentication',
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'ABOUT',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+          ]),
+
+          const SizedBox(height: 20),
+          _section("ABOUT"),
+          _card([
+            _tile(
+              icon: Icons.info,
+              title: "About App",
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutAppScreen()),
               ),
             ),
-          ),
-          _buildCard(
-            child: Column(
-              children: [
-                _buildSettingTile(
-                  icon: Icons.info,
-                  title: 'About App',
-                  trailing: const Text('v1.0.0'),
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingTile(
-                  icon: Icons.privacy_tip,
-                  title: 'Privacy Policy',
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                _buildSettingTile(
-                  icon: Icons.description,
-                  title: 'Terms of Service',
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
+          ]),
         ],
       ),
     );
   }
 
-  Widget _buildCard({required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: child,
-    );
-  }
+  /* ---------- UI HELPERS ---------- */
 
-  Widget _buildSettingTile({
+  Widget _section(String title) => Padding(
+    padding: const EdgeInsets.only(left: 8, bottom: 8),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: Colors.grey,
+      ),
+    ),
+  );
+
+  Widget _card(List<Widget> children) => Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Column(children: children),
+  );
+
+  Widget _tile({
     required IconData icon,
     required String title,
-    Widget? trailing,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFF0AA6B7)),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 16),
-      ),
-      trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
-    );
-  }
+    VoidCallback? onTap,
+  }) => ListTile(
+    leading: Icon(icon, color: const Color(0xFF0AA6B7)),
+    title: Text(title),
+    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+    onTap: onTap,
+  );
 
-  Widget _buildSwitchTile({
+  Widget _switchTile({
     required IconData icon,
     required String title,
     required bool value,
     required ValueChanged<bool> onChanged,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFF0AA6B7)),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 16),
-      ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeThumbColor: const Color(0xFF0AA6B7),
-      ),
-    );
-  }
+  }) => ListTile(
+    leading: Icon(icon, color: const Color(0xFF0AA6B7)),
+    title: Text(title),
+    trailing: Switch(
+      value: value,
+      onChanged: onChanged,
+      activeThumbColor: const Color(0xFF0AA6B7),
+    ),
+  );
 }

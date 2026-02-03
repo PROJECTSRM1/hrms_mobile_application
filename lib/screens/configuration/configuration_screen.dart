@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'departments_screen.dart';
+import 'designations_screen.dart';
+import 'roles_screen.dart';
+import 'interview_stages_screen.dart';
+import 'projects_screen.dart';
 
 class ConfigurationScreen extends StatelessWidget {
   const ConfigurationScreen({super.key});
@@ -8,48 +13,90 @@ class ConfigurationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
-        title: const Text('Configuration'),
-        backgroundColor: const Color(0xFF0AA6B7),
+        title: const Text("Config"),
         foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 1,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF0F4C5C),
+                Color(0xFF0AA6B7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildCard(
-            icon: Icons.business,
-            title: 'Company Settings',
-            subtitle: 'Configure company information',
-            onTap: () {},
+            icon: Icons.apartment,
+            title: 'Departments',
+            subtitle: 'Create and manage departments',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DepartmentsScreen(),
+                ),
+              );
+            },
           ),
           _buildCard(
-            icon: Icons.account_tree,
-            title: 'Department Management',
-            subtitle: 'Manage departments and hierarchy',
-            onTap: () {},
+            icon: Icons.badge,
+            title: 'Designations',
+            subtitle: 'Manage job designations',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DesignationsScreen(),
+                ),
+              );
+            },
           ),
           _buildCard(
-            icon: Icons.work_outline,
-            title: 'Designation Setup',
-            subtitle: 'Configure job designations',
-            onTap: () {},
+            icon: Icons.people_outline,
+            title: 'Roles',
+            subtitle: 'Configure system roles & permissions',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const RolesScreen(),
+                ),
+              );
+            },
           ),
           _buildCard(
-            icon: Icons.schedule,
-            title: 'Work Schedules',
-            subtitle: 'Set up work shifts and timings',
-            onTap: () {},
+            icon: Icons.layers_outlined,
+            title: 'Interview Stages',
+            subtitle: 'Define interview workflow stages',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const InterviewStagesScreen(),
+                ),
+              );
+            },
           ),
           _buildCard(
-            icon: Icons.category,
-            title: 'Leave Types',
-            subtitle: 'Configure leave categories',
-            onTap: () {},
-          ),
-          _buildCard(
-            icon: Icons.currency_rupee,
-            title: 'Salary Components',
-            subtitle: 'Define salary structure',
-            onTap: () {},
+            icon: Icons.assignment_outlined,
+            title: 'Projects',
+            subtitle: 'Manage company projects',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProjectsScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -76,7 +123,10 @@ class ConfigurationScreen extends StatelessWidget {
             color: const Color(0xFF0AA6B7).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: const Color(0xFF0AA6B7)),
+          child: Icon(
+            icon,
+            color: const Color(0xFF0AA6B7),
+          ),
         ),
         title: Text(
           title,

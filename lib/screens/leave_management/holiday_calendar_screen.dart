@@ -1,124 +1,198 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../common/widgets/hrms_app_bar.dart';
+import '../../models/holiday_model.dart';
+import '../../services/holiday_service.dart';
 
-class HolidayCalendarScreen extends StatelessWidget {
+class HolidayCalendarScreen extends StatefulWidget {
   const HolidayCalendarScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final holidays = [
-      {'name': 'Republic Day', 'date': 'Jan 26, 2024', 'day': 'Friday'},
-      {'name': 'Holi', 'date': 'Mar 25, 2024', 'day': 'Monday'},
-      {'name': 'Good Friday', 'date': 'Mar 29, 2024', 'day': 'Friday'},
-      {'name': 'Independence Day', 'date': 'Aug 15, 2024', 'day': 'Thursday'},
-      {'name': 'Gandhi Jayanti', 'date': 'Oct 2, 2024', 'day': 'Wednesday'},
-      {'name': 'Diwali', 'date': 'Nov 1, 2024', 'day': 'Friday'},
-      {'name': 'Christmas', 'date': 'Dec 25, 2024', 'day': 'Wednesday'},
-    ];
+  State<HolidayCalendarScreen> createState() =>
+      _HolidayCalendarScreenState();
+}
 
+class _HolidayCalendarScreenState
+    extends State<HolidayCalendarScreen> {
+  late Future<List<Holiday>> future;
+  int selectedYear = DateTime.now().year;
+
+  @override
+  void initState() {
+    super.initState();
+    future = HolidayService.fetchHolidays();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FB),
-      appBar: AppBar(
-        title: const Text('Holiday Calendar'),
-        backgroundColor: const Color(0xFF0AA6B7),
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0AA6B7), Color(0xFF0891A1)],
+      backgroundColor: const Color(0xFFF4F6F8),
+      appBar: const HrmsAppBar(),
+      body: FutureBuilder<List<Holiday>>(
+        future: future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
+            return const Center(
+                child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                snapshot.error.toString(),
+                style:
+                    const TextStyle(color: Colors.red),
               ),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  'Total Holidays',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+            );
+          }
+
+          final holidays = snapshot.data!
+              .where((h) => h.date.year == selectedYear)
+              .toList();
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _header(),
+              const SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics:
+                    const NeverScrollableScrollPhysics(),
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.95,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${holidays.length}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'in 2024',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
+                itemCount: 12,
+                itemBuilder: (context, index) {
+                  final month = index + 1;
+                  final monthHolidays = holidays
+                      .where(
+                          (h) => h.date.month == month)
+                      .toList();
+
+                  return _monthCard(month, monthHolidays);
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // ================= HEADER =================
+
+  Widget _header() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          'Holiday Calendar',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: holidays.length,
-              itemBuilder: (context, index) {
-                final holiday = holidays[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0AA6B7).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.celebration,
-                        color: Color(0xFF0AA6B7),
-                      ),
+        ),
+        Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: selectedYear,
+              items: List.generate(
+                5,
+                (i) => DateTime.now().year - i,
+              )
+                  .map(
+                    (y) => DropdownMenuItem(
+                      value: y,
+                      child: Text(y.toString()),
                     ),
-                    title: Text(
-                      holiday['name']!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          holiday['date']!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          holiday['day']!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+                  )
+                  .toList(),
+              onChanged: (v) {
+                setState(() => selectedYear = v!);
               },
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  // ================= MONTH CARD =================
+
+  Widget _monthCard(int month, List<Holiday> holidays) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color:
+                Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${DateFormat.MMM().format(DateTime(0, month))} $selectedYear',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+          const Divider(height: 20),
+          if (holidays.isEmpty)
+            const Text(
+              'No Holidays',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 13,
+              ),
+            )
+          else
+            ...holidays.map(
+              (h) => Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat('dd')
+                          .format(h.date),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        h.name,
+                        style: const TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
