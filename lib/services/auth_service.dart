@@ -63,10 +63,10 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data["token"];
-
+        final empId = data["emp_id"];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("auth_token", token);
-
+        await prefs.setInt("emp_id", empId);
         return true;
       }
 
@@ -123,4 +123,6 @@ class AuthService {
     final token = await getToken();
     return token != null && token.isNotEmpty;
   }
+
+  static Future<dynamic> getProfile() async {}
 }

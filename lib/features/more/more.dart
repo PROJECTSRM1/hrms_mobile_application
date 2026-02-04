@@ -21,8 +21,17 @@ import '../../screens/analytics/analytics_screen.dart';
 import '../../screens/access_management/access_management_screen.dart';
 import '../../screens/settings/settings_screen.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+
+  /// ⭐ controls which tile is open
+  int _openedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +41,7 @@ class MoreScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+
           /// ================= PROFILE HEADER =================
           Container(
             padding: const EdgeInsets.all(16),
@@ -64,9 +74,9 @@ class MoreScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          /// ================= MODULES =================
+          /// ================= TASK MANAGEMENT =================
           _expandableCard(
-            context: context,
+            index: 0,
             icon: Icons.task_alt,
             title: "Task Management",
             children: [
@@ -77,12 +87,13 @@ class MoreScreen extends StatelessWidget {
             ],
           ),
 
+          /// ================= LEAVE MANAGEMENT =================
           _expandableCard(
-            context: context,
+            index: 1,
             icon: Icons.event_note,
             title: "Leave Management",
             children: [
-              _leaveDropdown(context), // ✅ ONLY CHANGE HERE
+              _leaveDropdown(context),
               _subItem(context, "Leave Balance", () => const LeaveBalanceScreen()),
               _subItem(context, "Leave Calendar", () => const LeaveCalendarScreen()),
               _subItem(context, "My Approvals", () => const MyApprovalsScreen()),
@@ -90,8 +101,9 @@ class MoreScreen extends StatelessWidget {
             ],
           ),
 
+          /// ================= SALARY =================
           _expandableCard(
-            context: context,
+            index: 2,
             icon: Icons.payments,
             title: "Salary",
             children: [
@@ -131,78 +143,36 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  /// ================= LEAVE DROPDOWN =================
-  static Widget _leaveDropdown(BuildContext context) {
-    String value = "Apply";
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Create / Apply Leave"),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade300),
-                  color: const Color(0xFFF6F8FB),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: value,
-                    isExpanded: true,
-                    items: const [
-                      DropdownMenuItem(value: "Apply", child: Text("Apply Leave")),
-                      DropdownMenuItem(value: "Pending", child: Text("Pending Leaves")),
-                      DropdownMenuItem(value: "History", child: Text("Leave History")),
-                    ],
-                    onChanged: (v) {
-                      setState(() => value = v!);
-
-                      if (v == "Apply") {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => const ApplyLeaveScreen()));
-                      } else if (v == "Pending") {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => const PendingLeaveScreen()));
-                      } else {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => const LeaveHistoryScreen()));
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  /// ================= HELPERS =================
-  static Widget _expandableCard({
-    required BuildContext context,
+  /// ================= EXPANDABLE CARD =================
+  Widget _expandableCard({
+    required int index,
     required IconData icon,
     required String title,
     required List<Widget> children,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: ExpansionTile(
+        key: ValueKey(index),
         leading: Icon(icon, color: const Color(0xFF0AA6B7)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        initiallyExpanded: _openedIndex == index,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _openedIndex = expanded ? index : -1;
+          });
+        },
         children: children,
       ),
     );
   }
 
-  static Widget _subItem(BuildContext context, String title, Widget Function() screen) {
+  /// ================= SUB ITEM =================
+  Widget _subItem(BuildContext context, String title, Widget Function() screen) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 56, right: 16),
       title: Text(title),
@@ -210,7 +180,8 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  static Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screen) {
+  /// ================= SIMPLE CARD =================
+  Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screen) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
@@ -222,7 +193,33 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  static void _showLogoutDialog(BuildContext context) {
+  /// ================= LEAVE DROPDOWN =================
+  Widget _leaveDropdown(BuildContext context) {
+    String value = "Apply";
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Padding(
+          padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
+          child: DropdownButton<String>(
+            value: value,
+            isExpanded: true,
+            items: const [
+              DropdownMenuItem(value: "Apply", child: Text("Apply Leave")),
+              DropdownMenuItem(value: "Pending", child: Text("Pending Leaves")),
+              DropdownMenuItem(value: "History", child: Text("Leave History")),
+            ],
+            onChanged: (v) {
+              setState(() => value = v!);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  /// ================= LOGOUT =================
+  void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(

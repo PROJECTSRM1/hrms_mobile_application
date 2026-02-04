@@ -32,5 +32,5 @@ flutter:
   uses-material-design: true
 
   # Uncomment if you have assets
-  # assets:
-  #   - assets/images/
+  assets:
+    - assets/images/
