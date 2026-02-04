@@ -20,7 +20,6 @@ class _MyApprovalsScreenState extends State<MyApprovalsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // TODO: fetch approvals from backend
   }
 
   @override
@@ -91,7 +90,7 @@ class _MyApprovalsScreenState extends State<MyApprovalsScreen>
           Expanded(
             child: ListView.separated(
               itemCount: data.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 return _tableRow(data[index], isPending);
               },
@@ -213,7 +212,6 @@ class _MyApprovalsScreenState extends State<MyApprovalsScreen>
     Map<String, dynamic> row,
     bool approve,
   ) async {
-    // TODO:
     // POST /leave/approve-reject
     // body:
     // {
