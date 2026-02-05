@@ -5,16 +5,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   static const String baseUrl = "https://hrms-be-ppze.onrender.com";
 
+  /* ===================== STORAGE KEYS ===================== */
+  static const String _tokenKey = "auth_token";
+  static const String _employeeIdKey = "employee_id";
+
   /* ===================== TOKEN ===================== */
 
   static Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("auth_token", token);
+    await prefs.setString(_tokenKey, token);
   }
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("auth_token");
+    return prefs.getString(_tokenKey);
+  }
+
+  static Future<int?> getEmployeeId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_employeeIdKey);
   }
 
   static Future<void> logout() async {
@@ -32,7 +41,7 @@ class AuthService {
 
     if (auth) {
       final token = await getToken();
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         headers["Authorization"] = "Bearer $token";
       }
     }
@@ -62,18 +71,41 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
         final token = data["token"];
-        final empId = data["emp_id"];
+        final employeeId = data["emp_id"]; // from backend
+
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("auth_token", token);
-        await prefs.setInt("emp_id", empId);
+        await prefs.setString(_tokenKey, token);
+        await prefs.setInt(_employeeIdKey, employeeId);
+
         return true;
       }
 
       return false;
     } catch (e) {
-      print('Login error: $e');
+      print("Login error: $e");
       return false;
+    }
+  }
+
+  /* ===================== PROFILE ===================== */
+
+  /// GET /auth/me
+  static Future<Map<String, dynamic>?> getProfile() async {
+    try {
+      final res = await http.get(
+        Uri.parse("$baseUrl/auth/me"),
+        headers: await _headers(),
+      );
+
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      }
+      return null;
+    } catch (e) {
+      print("Profile error: $e");
+      return null;
     }
   }
 
@@ -98,7 +130,7 @@ class AuthService {
     return res.statusCode == 200;
   }
 
-  /* ===================== CHANGE PASSWORD ===================== */
+  /* ===================== PASSWORD ===================== */
 
   /// PUT /auth/change-password
   static Future<bool> changePassword({
@@ -119,10 +151,10 @@ class AuthService {
     return res.statusCode == 200;
   }
 
+  /* ===================== SESSION ===================== */
+
   static Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
   }
-
-  static Future<dynamic> getProfile() async {}
 }

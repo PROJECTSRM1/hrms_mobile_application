@@ -1,258 +1,258 @@
 import 'package:flutter/material.dart';
 
-class SalaryRevisionScreen extends StatefulWidget {
+class SalaryRevisionScreen extends StatelessWidget {
   const SalaryRevisionScreen({super.key});
-
-  @override
-  State<SalaryRevisionScreen> createState() => _SalaryRevisionScreenState();
-}
-
-class _SalaryRevisionScreenState extends State<SalaryRevisionScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String? _selectedEmployee;
-  final _currentSalaryController = TextEditingController(text: '50,000');
-  final _revisedSalaryController = TextEditingController();
-  final _reasonController = TextEditingController();
-  DateTime _effectiveDate = DateTime.now();
-
-  final List<String> _employees = [
-    'John Doe',
-    'Jane Smith',
-    'Bob Wilson',
-    'Alice Brown',
-  ];
-
-  @override
-  void dispose() {
-    _currentSalaryController.dispose();
-    _revisedSalaryController.dispose();
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  double? get _increasePercentage {
-    final current = double.tryParse(_currentSalaryController.text.replaceAll(',', ''));
-    final revised = double.tryParse(_revisedSalaryController.text.replaceAll(',', ''));
-    if (current != null && revised != null && current > 0) {
-      return ((revised - current) / current) * 100;
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FB),
+      backgroundColor: const Color(0xFFF4F6F9),
       appBar: AppBar(
-        title: const Text('Salary Revision'),
-        backgroundColor: const Color(0xFF0AA6B7),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF0D9488),
+        title: const Text("Salary Revision Analytics"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Employee Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedEmployee,
-                      decoration: const InputDecoration(
-                        labelText: 'Select Employee',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      items: _employees
-                          .map((employee) => DropdownMenuItem(
-                                value: employee,
-                                child: Text(employee),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedEmployee = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select an employee';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Salary Information',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _currentSalaryController,
-                      decoration: const InputDecoration(
-                        labelText: 'Current Salary (₹)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.currency_rupee),
-                      ),
-                      keyboardType: TextInputType.number,
-                      enabled: false,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _revisedSalaryController,
-                      decoration: const InputDecoration(
-                        labelText: 'Revised Salary (₹)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.currency_rupee),
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) => setState(() {}),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter revised salary';
-                        }
-                        return null;
-                      },
-                    ),
-                    if (_increasePercentage != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: _increasePercentage! >= 0
-                              ? Colors.green.withValues(alpha: 0.5)
-                              : Colors.red.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _increasePercentage! >= 0
-                                  ? Icons.trending_up
-                                  : Icons.trending_down,
-                              color: _increasePercentage! >= 0
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${_increasePercentage!.toStringAsFixed(2)}% ${_increasePercentage! >= 0 ? 'increase' : 'decrease'}',
-                              style: TextStyle(
-                                color: _increasePercentage! >= 0
-                                    ? Colors.green
-                                    : Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.calendar_today, color: Color(0xFF0AA6B7)),
-                      title: const Text('Effective Date'),
-                      subtitle: Text(
-                        '${_effectiveDate.day}/${_effectiveDate.month}/${_effectiveDate.year}',
-                      ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: _effectiveDate,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2025),
-                        );
-                        if (picked != null) {
-                          setState(() {
-                            _effectiveDate = picked;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _reasonController,
-                      decoration: const InputDecoration(
-                        labelText: 'Reason for Revision',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.description),
-                      ),
-                      maxLines: 3,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter reason for revision';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Salary revision submitted successfully!'),
-                        ),
-                      );
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0AA6B7),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Submit Revision',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            _salaryGrowthCard(),
+            const SizedBox(height: 16),
+            _ctcRevisionCard(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCard({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+  /* ================= SALARY GRAPH ================= */
+
+  Widget _salaryGrowthCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Salary Growth by Year of Joining",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 260,
+              width: double.infinity,
+              child: CustomPaint(
+                painter: SalaryChartPainter(),
+              ),
+            ),
+          ],
+        ),
       ),
-      child: child,
     );
   }
+
+  /* ================= CTC REVISION ================= */
+
+  Widget _ctcRevisionCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              "CTC Revision Details",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 12),
+
+            _CtcItem(
+              lastRevision: "15-Jan-2024",
+              payout: "Jan 24",
+              revised: "65,000",
+              previous: "58,000",
+              duration: "12 M",
+              amount: "7,000",
+            ),
+
+            Divider(height: 28),
+
+            _CtcItem(
+              lastRevision: "15-Jan-2023",
+              payout: "Jan 23",
+              revised: "58,000",
+              previous: "52,000",
+              duration: "12 M",
+              amount: "6,000",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/* ================= CTC ITEM ================= */
+
+class _CtcItem extends StatelessWidget {
+  final String lastRevision;
+  final String payout;
+  final String revised;
+  final String previous;
+  final String duration;
+  final String amount;
+
+  const _CtcItem({
+    required this.lastRevision,
+    required this.payout,
+    required this.revised,
+    required this.previous,
+    required this.duration,
+    required this.amount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _row("Last Revision", lastRevision),
+        _row("Payout", payout),
+        _row("Revised CTC", revised),
+        _row("Previous CTC", previous),
+        _row("Duration", duration),
+        _row("Amount", amount, highlight: true),
+      ],
+    );
+  }
+
+  Widget _row(String label, String value, {bool highlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: highlight ? FontWeight.w600 : FontWeight.w500,
+              color: highlight ? Colors.green : Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* ================= GRAPH PAINTER ================= */
+
+class SalaryChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const leftPad = 40.0;
+    const bottomPad = 30.0;
+
+    final chartWidth = size.width - leftPad;
+    final chartHeight = size.height - bottomPad;
+
+    final axisPaint = Paint()
+      ..color = Colors.black54
+      ..strokeWidth = 1;
+
+    final gridPaint = Paint()
+      ..color = Colors.grey.shade300
+      ..strokeWidth = 1;
+
+    final linePaint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 2.5
+      ..style = PaintingStyle.stroke;
+
+    final dotPaint = Paint()..color = Colors.blue;
+
+    /* Axes */
+    canvas.drawLine(
+      Offset(leftPad, 0),
+      Offset(leftPad, chartHeight),
+      axisPaint,
+    );
+
+    canvas.drawLine(
+      Offset(leftPad, chartHeight),
+      Offset(size.width, chartHeight),
+      axisPaint,
+    );
+
+    /* Y-axis grid + labels */
+    final yLabels = [8, 6, 4, 2, 0];
+    for (int i = 0; i < yLabels.length; i++) {
+      final y = chartHeight * (i / 4);
+
+      canvas.drawLine(
+        Offset(leftPad, y),
+        Offset(size.width, y),
+        gridPaint,
+      );
+
+      _drawText(
+        canvas,
+        yLabels[i].toString(),
+        Offset(8, y - 6),
+      );
+    }
+
+    /* X-axis data */
+    final years = ["2019", "2020", "2021", "2022", "2023"];
+    final values = [2.5, 2.0, 3.8, 5.2, 4.0];
+
+    final path = Path();
+
+    for (int i = 0; i < values.length; i++) {
+      final x = leftPad + chartWidth * (i / (values.length - 1));
+      final y = chartHeight - (values[i] / 8) * chartHeight;
+
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+
+      canvas.drawCircle(Offset(x, y), 4, dotPaint);
+
+      _drawText(
+        canvas,
+        years[i],
+        Offset(x - 14, chartHeight + 6),
+      );
+    }
+
+    canvas.drawPath(path, linePaint);
+  }
+
+  void _drawText(Canvas canvas, String text, Offset offset) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(fontSize: 11, color: Colors.black54),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    painter.paint(canvas, offset);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

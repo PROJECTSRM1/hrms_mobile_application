@@ -11,7 +11,7 @@ import '../../screens/leave_management/my_approvals_screen.dart';
 import '../../screens/leave_management/holiday_calendar_screen.dart';
 import '../../screens/leave_management/pending_leave_screen.dart';
 import '../../screens/leave_management/leave_history_screen.dart';
-import '../../screens/salary/create_payslips_screen.dart';
+import '../../screens/salary/payslip_screen.dart';
 import '../../screens/salary/salary_revision_screen.dart';
 import '../../screens/performance/performance_screen.dart';
 import '../../screens/recruiting/recruiting_screen.dart';
@@ -107,7 +107,7 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.payments,
             title: "Salary",
             children: [
-              _subItem(context, "Create Payslips", () => const CreatePayslipsScreen()),
+              _subItem(context, "Payslips", () => const PayslipScreen()),
               _subItem(context, "Salary Revision", () => const SalaryRevisionScreen()),
             ],
           ),
