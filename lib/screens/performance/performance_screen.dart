@@ -4,7 +4,7 @@ import 'package:hrms_mobile_application/models/performance_rating.dart';
 import 'package:hrms_mobile_application/services/performance_service.dart';
 import 'package:hrms_mobile_application/screens/performance/top_performers_screen.dart';
 import 'package:hrms_mobile_application/screens/performance/pending_reviews_screen.dart';
-import 'package:hrms_mobile_application/screens/performance/all_ratings_screen.dart';
+// import 'package:hrms_mobile_application/screens/performance/all_ratings_screen.dart';
 
 class PerformanceScreen extends StatefulWidget {
   const PerformanceScreen({super.key});
@@ -205,7 +205,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -293,7 +293,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
         children: [
           _buildTableHeader(),
           const Divider(height: 1),
-          ..._filteredRatings.map((rating) => _buildTableRow(rating)).toList(),
+          ..._filteredRatings.map((rating) => _buildTableRow(rating)),
         ],
       ),
     );

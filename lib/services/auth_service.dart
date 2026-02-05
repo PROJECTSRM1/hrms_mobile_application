@@ -66,7 +66,7 @@ class AuthService {
         final empId = data["emp_id"];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("auth_token", token);
-        await prefs.setInt("emp_id", empId);
+        
         return true;
       }
 
