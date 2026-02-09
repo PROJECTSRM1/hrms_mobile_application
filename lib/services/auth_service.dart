@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -64,15 +65,23 @@ class AuthService {
         final data = jsonDecode(response.body);
         final token = data["token"];
         final empId = data["emp_id"];
+
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("auth_token", token);
+        await prefs.setString("emp_id", empId.toString());
+
+        await _saveToken(token);
+
+
+        // final prefs = await SharedPreferences.getInstance();
+        // await prefs.setString("auth_token", token);
+        // await _saveToken(token);
         
         return true;
       }
 
       return false;
     } catch (e) {
-      print('Login error: $e');
+      debugPrint('Login error: $e');
       return false;
     }
   }
