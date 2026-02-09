@@ -1,4 +1,3 @@
-
 name: hrms_mobile_application
 description: "A Flutter HRMS mobile application for task management"
 publish_to: 'none'
@@ -12,16 +11,25 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # UI & utilities
   cupertino_icons: ^1.0.8
-  http: ^1.2.0
-  shared_preferences: ^2.2.2
   intl: ^0.19.0
   provider: ^6.1.2
+
+  # Network & storage
+  http: ^1.2.0
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.2
+
+  # PDF & files
+  pdf: ^3.10.7
+  printing: ^5.12.0
+
+  # Media
   image_picker: ^1.0.7
 
-  # PDF Export
-  pdf: ^3.10.8
-  printing: ^5.12.0
+  # ✅ REQUIRED FOR ACCESS MANAGEMENT DROPDOWNS
+  dropdown_search: ^5.0.6
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +39,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Uncomment if you have assets
   assets:
     - assets/images/

@@ -13,6 +13,8 @@ import '../../screens/leave_management/pending_leave_screen.dart';
 import '../../screens/leave_management/leave_history_screen.dart';
 import '../../screens/salary/payslip_screen.dart';
 import '../../screens/salary/salary_revision_screen.dart';
+import '../../screens/salary/it_declaration_screen.dart';
+import '../../screens/salary/proof_of_investment_screen.dart';
 import '../../screens/performance/performance_screen.dart';
 import '../../screens/recruiting/recruiting_screen.dart';
 import '../../screens/configuration/configuration_screen.dart';
@@ -109,6 +111,8 @@ class _MoreScreenState extends State<MoreScreen> {
             children: [
               _subItem(context, "Payslips", () => const PayslipScreen()),
               _subItem(context, "Salary Revision", () => const SalaryRevisionScreen()),
+                _subItem(context, "IT Declaration", () => const ItDeclarationScreen()),
+                _subItem(context, "Proof of Investment",() => const ProofOfInvestmentScreen(),),
             ],
           ),
 
