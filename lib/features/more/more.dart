@@ -111,7 +111,7 @@ class _MoreScreenState extends State<MoreScreen> {
             children: [
               _subItem(context, "Payslips", () => const PayslipScreen()),
               _subItem(context, "Salary Revision", () => const SalaryRevisionScreen()),
-                _subItem(context, "IT Declaration", () => const ItDeclarationScreen()),
+                _subItem(context, "IT Declaration", () => const ITDeclarationScreen()),
                 _subItem(context, "Proof of Investment",() => const ProofOfInvestmentScreen(),),
             ],
           ),
