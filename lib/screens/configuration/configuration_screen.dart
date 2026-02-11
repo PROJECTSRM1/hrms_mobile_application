@@ -4,6 +4,7 @@ import 'designations_screen.dart';
 import 'roles_screen.dart';
 import 'interview_stages_screen.dart';
 import 'projects_screen.dart';
+import 'project_modules_screen.dart'; // ✅ NEW
 
 class ConfigurationScreen extends StatelessWidget {
   const ConfigurationScreen({super.key});
@@ -94,6 +95,21 @@ class ConfigurationScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) => const ProjectsScreen(),
+                ),
+              );
+            },
+          ),
+
+          /// ✅ NEW: PROJECT MODULES
+          _buildCard(
+            icon: Icons.view_module_outlined,
+            title: 'Project Modules',
+            subtitle: 'Configure modules under projects',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProjectModulesScreen(),
                 ),
               );
             },

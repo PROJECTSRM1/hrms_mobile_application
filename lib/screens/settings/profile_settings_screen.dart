@@ -11,10 +11,10 @@ class ProfileSettingsScreen extends StatefulWidget {
 }
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
-  final firstCtrl = TextEditingController();
-  final lastCtrl = TextEditingController();
-  final emailCtrl = TextEditingController();
-  final mobileCtrl = TextEditingController();
+  final TextEditingController firstCtrl = TextEditingController();
+  final TextEditingController lastCtrl = TextEditingController();
+  final TextEditingController emailCtrl = TextEditingController();
+  final TextEditingController mobileCtrl = TextEditingController();
 
   String language = "English";
   bool loading = true;
@@ -25,12 +25,31 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    firstCtrl.dispose();
+    lastCtrl.dispose();
+    emailCtrl.dispose();
+    mobileCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     final profile = await AuthService.getProfile();
-    firstCtrl.text = profile['first_name'];
-    lastCtrl.text = profile['last_name'];
-    emailCtrl.text = profile['email'];
-    mobileCtrl.text = profile['mobile'];
+
+    if (!mounted) return;
+
+    if (profile == null) {
+      debugPrint("Profile data is null");
+      setState(() => loading = false);
+      return;
+    }
+
+    firstCtrl.text = profile['first_name'] ?? '';
+    lastCtrl.text = profile['last_name'] ?? '';
+    emailCtrl.text = profile['email'] ?? '';
+    mobileCtrl.text = profile['mobile'] ?? '';
+
     setState(() => loading = false);
   }
 
@@ -41,6 +60,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       email: emailCtrl.text,
       mobile: mobileCtrl.text,
     );
+
+    if (!mounted) return;
 
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,24 +75,24 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  title: const Text(" Profile Settings"),
-  foregroundColor: Colors.white,
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  flexibleSpace: Container(
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Color(0xFF0F4C5C),
-          Color(0xFF0AA6B7),
-        ],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
+        title: const Text(" Profile Settings"),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF0F4C5C),
+                Color(0xFF0AA6B7),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
-    ),
-  ),
-),
-body: loading
+      body: loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16),
@@ -85,11 +106,21 @@ body: loading
                   DropdownButtonFormField(
                     initialValue: language,
                     items: const [
-                      DropdownMenuItem(value: "English", child: Text("English")),
-                      DropdownMenuItem(value: "Hindi", child: Text("Hindi")),
-                      DropdownMenuItem(value: "Telugu", child: Text("Telugu")),
+                      DropdownMenuItem(
+                        value: "English",
+                        child: Text("English"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Hindi",
+                        child: Text("Hindi"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Telugu",
+                        child: Text("Telugu"),
+                      ),
                     ],
-                    onChanged: (v) => setState(() => language = v.toString()),
+                    onChanged: (v) =>
+                        setState(() => language = v.toString()),
                     decoration: const InputDecoration(
                       labelText: "Language",
                       border: OutlineInputBorder(),
@@ -109,14 +140,16 @@ body: loading
     );
   }
 
-  Widget _field(String label, TextEditingController c) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: TextField(
-          controller: c,
-          decoration: InputDecoration(
-            labelText: label,
-            border: const OutlineInputBorder(),
-          ),
+  Widget _field(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
         ),
-      );
+      ),
+    );
+  }
 }
