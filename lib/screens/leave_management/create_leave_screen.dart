@@ -3,7 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
+import '../../services/leave_api_service.dart';
 
 class ApplyLeaveScreen extends StatefulWidget {
   const ApplyLeaveScreen({super.key});
@@ -15,31 +15,29 @@ class ApplyLeaveScreen extends StatefulWidget {
 class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController reasonCtrl = TextEditingController();
-  final TextEditingController mobileCtrl = TextEditingController();
-
-  final ImagePicker _picker = ImagePicker();
+  final reasonCtrl = TextEditingController();
+  final mobileCtrl = TextEditingController();
 
   DateTime? fromDate;
   DateTime? toDate;
 
   String? leaveType;
-  String? reportingManager;
   String? fromSession;
   String? toSession;
+  String? reportingManager;
   String? ccEmployee;
 
   File? selectedFile;
   bool loading = false;
 
-  // ---------------- UI ----------------
+  final picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
-        title: const Text("Apply Leave"),
+        title: const Text('Apply Leave'),
         backgroundColor: const Color(0xFF0AA6B7),
       ),
       body: SingleChildScrollView(
@@ -49,32 +47,47 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           child: _card(
             Column(
               children: [
-                _dropdown("Leave Type *", ["Sick Leave", "Casual Leave"],
-                    (v) => leaveType = v),
+                _dropdown(
+                  "Leave Type *",
+                  ["Sick Leave", "Casual Leave"],
+                  (v) => leaveType = v,
+                ),
                 _gap(),
 
-                _dropdown("Reporting Manager *", ["Manager A", "Manager B"],
-                    (v) => reportingManager = v),
+                _dropdown(
+                  "Reporting Manager *",
+                  ["Manager A", "Manager B"],
+                  (v) => reportingManager = v,
+                ),
                 _gap(),
 
                 _datePicker("From Date *", fromDate,
                     (d) => setState(() => fromDate = d)),
                 _gap(),
 
-                _dropdown("From Session *", ["Morning", "Afternoon"],
-                    (v) => fromSession = v),
+                _dropdown(
+                  "From Session *",
+                  ["Morning", "Afternoon"],
+                  (v) => fromSession = v,
+                ),
                 _gap(),
 
                 _datePicker("To Date *", toDate,
                     (d) => setState(() => toDate = d)),
                 _gap(),
 
-                _dropdown("To Session *", ["Morning", "Afternoon"],
-                    (v) => toSession = v),
+                _dropdown(
+                  "To Session *",
+                  ["Morning", "Afternoon"],
+                  (v) => toSession = v,
+                ),
                 _gap(),
 
-                _dropdown("CC", ["Employee A", "Employee B"],
-                    (v) => ccEmployee = v),
+                _dropdown(
+                  "CC",
+                  ["Employee A", "Employee B"],
+                  (v) => ccEmployee = v,
+                ),
                 _gap(),
 
                 _mobileField(),
@@ -95,7 +108,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  // ---------------- WIDGETS ----------------
+  // -------------------- UI HELPERS --------------------
 
   Widget _dropdown(
       String label, List<String> items, Function(String?) onChanged) {
@@ -104,7 +117,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       items:
           items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
       onChanged: onChanged,
-      validator: label.contains("*")
+      validator: label.contains('*')
           ? (v) => v == null ? "Required" : null
           : null,
     );
@@ -125,7 +138,9 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       child: InputDecorator(
         decoration: _inputDecoration(label),
         child: Text(
-          value == null ? "Select date" : value.toString().split(" ")[0],
+          value == null
+              ? "Select date"
+              : value.toIso8601String().split('T')[0],
         ),
       ),
     );
@@ -137,11 +152,11 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
       keyboardType: TextInputType.phone,
       decoration:
           _inputDecoration("Mobile Number *").copyWith(prefixText: "+91 "),
-      validator: (v) => v == null || v.length < 10 ? "Invalid number" : null,
+      validator: (v) =>
+          v == null || v.length < 10 ? "Invalid mobile number" : null,
     );
   }
 
-  /// 📷 Image picker (Gallery)
   Widget _uploadButton() {
     return OutlinedButton.icon(
       icon: const Icon(Icons.upload_file),
@@ -151,14 +166,9 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
             : selectedFile!.path.split('/').last,
       ),
       onPressed: () async {
-        final XFile? image = await _picker.pickImage(
-          source: ImageSource.gallery,
-        );
-
+        final image = await picker.pickImage(source: ImageSource.gallery);
         if (image != null) {
-          setState(() {
-            selectedFile = File(image.path);
-          });
+          setState(() => selectedFile = File(image.path));
         }
       },
     );
@@ -182,7 +192,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
               backgroundColor: const Color(0xFF0AA6B7),
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
-            onPressed: loading ? null : _submitLeave,
+            onPressed: loading ? null : _submit,
             child: loading
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text("Apply"),
@@ -199,59 +209,38 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     );
   }
 
-  // ---------------- API ----------------
+  // -------------------- SUBMIT --------------------
 
-  Future<void> _submitLeave() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => loading = true);
 
-    final request = http.MultipartRequest(
-      "POST",
-      Uri.parse("https://hrms-be-ppze.onrender.com/leave/apply"),
+    final success = await LeaveApiService.applyLeave(
+      leaveTypeId: leaveType == "Sick Leave" ? 1 : 2,
+      startDate: fromDate!.toIso8601String().split('T')[0],
+      endDate: toDate!.toIso8601String().split('T')[0],
+      fromSession: fromSession == "Morning" ? "FN" : "AN",
+      toSession: toSession == "Morning" ? "FN" : "AN",
+      reason: reasonCtrl.text,
+      mobile: mobileCtrl.text,
+      reportingManagerId: 1,
+      file: selectedFile,
     );
-
-    request.headers["Accept"] = "application/json";
-
-    request.fields.addAll({
-      "emp_id": "1",
-      "leavetype_id": "1",
-      "start_date": fromDate.toString().split(" ")[0],
-      "end_date": toDate.toString().split(" ")[0],
-      "from_date_session_id": fromSession == "Morning" ? "1" : "2",
-      "to_date_session_id": toSession == "Morning" ? "1" : "2",
-      "reason": reasonCtrl.text,
-      "mobile": mobileCtrl.text,
-      "reporting_manager_id": "1",
-      "cc": "",
-    });
-
-    if (selectedFile != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          "upload_file",
-          selectedFile!.path,
-        ),
-      );
-    }
-
-    final response = await request.send();
 
     setState(() => loading = false);
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Leave Applied Successfully")),
-      );
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed (${response.statusCode})")),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            success ? "Leave applied successfully" : "Failed to apply leave"),
+      ),
+    );
+
+    if (success) Navigator.pop(context);
   }
 
-  // ---------------- HELPERS ----------------
+  // -------------------- COMMON --------------------
 
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(

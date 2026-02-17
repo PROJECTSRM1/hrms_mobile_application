@@ -6,10 +6,15 @@ import '../../screens/task_management/create_task_screen.dart';
 import '../../screens/task_management/assign_task_screen.dart';
 import '../../screens/task_management/task_board_screen.dart';
 import '../../screens/task_management/task_history_screen.dart';
+
+import '../../screens/leave_management/create_leave_screen.dart';
+import '../../screens/leave_management/pending_leave_screen.dart';
+import '../../screens/leave_management/leave_history_screen.dart';
 import '../../screens/leave_management/leave_balance_screen.dart';
 import '../../screens/leave_management/leave_calendar_screen.dart';
 import '../../screens/leave_management/my_approvals_screen.dart';
 import '../../screens/leave_management/holiday_calendar_screen.dart';
+
 import '../../screens/salary/create_payslips_screen.dart';
 import '../../screens/salary/salary_revision_screen.dart';
 import '../../screens/performance/performance_screen.dart';
@@ -28,13 +33,16 @@ class MoreScreen extends StatefulWidget {
 }
 
 class _MoreScreenState extends State<MoreScreen> {
-  /// ⭐ controls which tile is open
+  /// controls which expansion tile is open
   int _openedIndex = -1;
 
-  /// 👤 profile data
+  /// profile
   String _name = '';
   String _role = '';
   bool _profileLoading = true;
+
+  /// leave dropdown value
+  String _leaveAction = 'Apply';
 
   @override
   void initState() {
@@ -44,7 +52,6 @@ class _MoreScreenState extends State<MoreScreen> {
 
   Future<void> _loadProfile() async {
     final profile = await AuthService.getProfile();
-
     if (!mounted) return;
 
     if (profile != null) {
@@ -86,7 +93,7 @@ class _MoreScreenState extends State<MoreScreen> {
         padding: const EdgeInsets.all(16),
         children: [
 
-          /// ================= PROFILE HEADER =================
+          /// ================= PROFILE =================
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -115,16 +122,10 @@ class _MoreScreenState extends State<MoreScreen> {
                         children: [
                           Text(
                             _name.isEmpty ? '—' : _name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            _role,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
+                          Text(_role, style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
               ],
@@ -184,10 +185,7 @@ class _MoreScreenState extends State<MoreScreen> {
           /// ================= LOGOUT =================
           Container(
             margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-            ),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
             child: ListTile(
               leading: const Icon(Icons.logout, color: Colors.redAccent),
               title: const Text(
@@ -211,10 +209,7 @@ class _MoreScreenState extends State<MoreScreen> {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
       child: ExpansionTile(
         key: ValueKey(index),
         leading: Icon(icon, color: const Color(0xFF0AA6B7)),
@@ -246,10 +241,7 @@ class _MoreScreenState extends State<MoreScreen> {
   Widget _simpleCard(BuildContext context, IconData icon, String title, Widget Function() screen) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF0AA6B7)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -261,28 +253,47 @@ class _MoreScreenState extends State<MoreScreen> {
     );
   }
 
-  /// ================= LEAVE DROPDOWN =================
+  /// ================= LEAVE DROPDOWN (NEAT + NAVIGATION) =================
   Widget _leaveDropdown(BuildContext context) {
-    String value = "Apply";
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
+      child: DropdownButtonFormField<String>(
+        initialValue: _leaveAction,
+        isExpanded: true,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        ),
+        items: const [
+          DropdownMenuItem(value: "Apply", child: Text("Apply Leave")),
+          DropdownMenuItem(value: "Pending", child: Text("Pending Leaves")),
+          DropdownMenuItem(value: "History", child: Text("Leave History")),
+        ],
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() => _leaveAction = value);
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
-          child: DropdownButton<String>(
-            value: value,
-            isExpanded: true,
-            items: const [
-              DropdownMenuItem(value: "Apply", child: Text("Apply Leave")),
-              DropdownMenuItem(value: "Pending", child: Text("Pending Leaves")),
-              DropdownMenuItem(value: "History", child: Text("Leave History")),
-            ],
-            onChanged: (v) {
-              setState(() => value = v!);
-            },
-          ),
-        );
-      },
+          Widget screen;
+          switch (value) {
+            case "Apply":
+              screen = const ApplyLeaveScreen();
+              break;
+            case "Pending":
+              screen = const PendingLeaveScreen();
+              break;
+            case "History":
+              screen = const LeaveHistoryScreen();
+              break;
+            default:
+              return;
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => screen),
+          );
+        },
+      ),
     );
   }
 
@@ -294,16 +305,10 @@ class _MoreScreenState extends State<MoreScreen> {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Colors.redAccent),
-            ),
+            child: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
