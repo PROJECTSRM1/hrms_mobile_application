@@ -14,7 +14,7 @@ class AuthService {
 
   static Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("auth_token", token);
+    await prefs.setString(_tokenKey, token);
   }
 
   static Future<void> _saveEmpId(dynamic empId) async {
@@ -47,7 +47,7 @@ class AuthService {
 
     if (auth) {
       final token = await getToken();
-      if (token != null && token.isNotEmpty && token.isNotEmpty) {
+      if (token != null && token.isNotEmpty) {
         headers["Authorization"] = "Bearer $token";
       }
     }
@@ -78,16 +78,16 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
+        await _saveToken(data["token"]);
+        await _saveEmpId(data["emp_id"]);
+
+
         final token = data["token"];
         final employeeId = data["emp_id"]; // from backend
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_tokenKey, token);
         await prefs.setInt(_employeeIdKey, employeeId);
-
-
-        await _saveToken(data["token"]);
-        await _saveEmpId(data["emp_id"]);
 
         return true;
       }
@@ -99,7 +99,30 @@ class AuthService {
     }
   }
 
+  /* ===================== PROFILE ===================== */
 
+  /// GET /auth/me
+  static Future<Map<String, dynamic>?> getProfile() async {
+    try {
+      final res = await http.get(
+        Uri.parse("$baseUrl/auth/me"),
+        headers: await _headers(),
+      );
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        if (data is Map<String, dynamic>) {
+          return data;
+        }
+      }
+
+      debugPrint("Get profile failed: ${res.statusCode}");
+      return null;
+    } catch (e) {
+      debugPrint("Get profile error: $e");
+      return null;
+    }
+  }
 
   /* ===================== PROFILE ===================== */
 
