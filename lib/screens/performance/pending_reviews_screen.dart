@@ -129,7 +129,8 @@ class _PendingReviewsScreenState extends State<PendingReviewsScreen> {
       child: Column(
         children: [
           _buildTableHeader(),
-          ..._getPaginatedReviews().map((review) => _buildTableRow(review)).toList(),
+          ..._getPaginatedReviews().map((review) => _buildTableRow(review)),
+
         ],
       ),
     );

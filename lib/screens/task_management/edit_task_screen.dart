@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/task_service.dart';
+import '../../models/task.dart';
 
 class EditTaskScreen extends StatefulWidget {
   final Map<String, dynamic> taskData;
@@ -199,17 +200,23 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         throw Exception('Task ID is missing');
       }
 
-      final updateData = {
-        'title': _titleController.text,
-        'description': _descriptionController.text,
-        'emp_id': _selectedEmployeeId,
-        'project_id': _selectedProjectId,
-        'status_id': _selectedStatusId,
-        'due_date': _dueDate!.toIso8601String().split('T')[0],
-        'efforts_in_days': int.tryParse(_effortsController.text) ?? 0,
-      };
+      
 
-      await TaskService.updateTaskById(taskId, updateData);
+final updatedTask = Task(
+  id: taskId,
+  title: _titleController.text,
+  description: _descriptionController.text,
+  empId: _selectedEmployeeId,
+  projectId: _selectedProjectId,
+  statusId: _selectedStatusId,
+  dueDate: _dueDate!.toIso8601String().split('T')[0],
+  effortsInDays: int.tryParse(_effortsController.text) ?? 0,
+  isActive: true,
+);
+
+await TaskService.updateTask(taskId, updatedTask);
+
+
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

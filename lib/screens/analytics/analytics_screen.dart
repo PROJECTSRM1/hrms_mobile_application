@@ -4,7 +4,7 @@ class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
   static const _primary = Color(0xFF0AA6B7);
-  static const _dark = Color(0xFF045D68);
+  // static const _dark = Color(0xFF045D68);
 
   @override
   Widget build(BuildContext context) {

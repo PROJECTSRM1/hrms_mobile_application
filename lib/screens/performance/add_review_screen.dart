@@ -264,7 +264,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<int>(
-          value: _selectedReviewerId,
+          initialValue: _selectedReviewerId,
           decoration: InputDecoration(
             hintText: 'Select Reviewer',
             border: OutlineInputBorder(

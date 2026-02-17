@@ -47,23 +47,24 @@ class Task {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      if (id != null) 'id': id,
-      'title': title,
-      'description': description,
-      if (taskTypeId != null) 'task_type_id': taskTypeId,
-      if (projectId != null) 'project_id': projectId,
-      if (projectModuleId != null) 'project_module_id': projectModuleId,
-      if (empId != null) 'emp_id': empId,
-      if (reportingManagerId != null) 'reporting_manager_id': reportingManagerId,
-      if (taskManagerId != null) 'task_manager_id': taskManagerId,
-      if (statusId != null) 'status_id': statusId,
-      if (dueDate != null) 'due_date': dueDate,
-      if (effortsInDays != null) 'efforts_in_days': effortsInDays,
-      if (isActive != null) 'is_active': isActive,
-    };
-  }
+Map<String, dynamic> toJson() {
+  return {
+    'id': id,
+    'title': title,
+    'description': description,
+    'task_type_id': taskTypeId,
+    'project_id': projectId,
+    'project_module_id': projectModuleId,
+    'emp_id': empId,
+    'reporting_manager_id': reportingManagerId,
+    'task_manager_id': taskManagerId,
+    'status_id': statusId,
+    'due_date': dueDate,
+    'efforts_in_days': effortsInDays,
+    'is_active': isActive,
+  };
+}
+
 
   Task copyWith({
     int? id,

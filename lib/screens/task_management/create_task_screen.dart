@@ -190,6 +190,7 @@ Future<void> _createTask() async {
       Navigator.pop(context, true);
     }
   } catch (e) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Failed to create task: $e"),
@@ -232,7 +233,8 @@ Future<void> _createTask() async {
                       Row(
                         children: [
                           // Task Name - Left Column
-                          Expanded(
+                          Flexible(
+                            fit: FlexFit.tight,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -294,7 +296,9 @@ Future<void> _createTask() async {
                           ),
                           const SizedBox(width: 16),
                           // Task Type - Right Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -372,7 +376,9 @@ Future<void> _createTask() async {
                       Row(
                         children: [
                           // Status - Left Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -446,7 +452,9 @@ Future<void> _createTask() async {
                           ),
                           const SizedBox(width: 16),
                           // Due Date - Right Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -595,7 +603,9 @@ Future<void> _createTask() async {
                       Row(
                         children: [
                           // Efforts (Days) - Left Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -661,7 +671,9 @@ Future<void> _createTask() async {
                           ),
                           const SizedBox(width: 16),
                           // Task Manager - Right Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -675,25 +687,30 @@ Future<void> _createTask() async {
                                 ),
                                 const SizedBox(height: 8),
                               DropdownButtonFormField<int>(
-  value: _taskManagerId,
-  decoration: InputDecoration(
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(4),
-    ),
-  ),
-  items: _managers.map((m) {
-    return DropdownMenuItem<int>(
-      value: m['id'] as int,
-      child: Text(m['name'] as String),
-    );
-  }).toList(),
-  onChanged: (value) {
-    setState(() => _taskManagerId = value);
-  },
-  validator: (v) => v == null ? "Select manager" : null,
-)
+                                isExpanded: true,
+                                initialValue: _taskManagerId,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                items: _managers.map((m) {
+                                  return DropdownMenuItem<int>(
+                                    value: m['id'] as int,
+                                    // child: Text(m['name'] as String),
+                                    child: Text(
+                                      m['name'] as String,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() => _taskManagerId = value);
+                                },
+                                validator: (v) => v == null ? "Select manager" : null,
+                              )
 
 
                               ],
@@ -705,7 +722,9 @@ Future<void> _createTask() async {
                       Row(
                         children: [
                           // Project - Left Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -782,7 +801,9 @@ Future<void> _createTask() async {
                           ),
                           const SizedBox(width: 16),
                           // Module - Right Column
-                          Expanded(
+                          Flexible(
+  fit: FlexFit.tight,
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
