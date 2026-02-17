@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/tax_declaration_model.dart';
 import 'sec_80c_edit_dialog.dart';
+import 'other_deductions_dialog.dart';
+import 'hra_edit_dialog.dart';
+import 'medical_80d_dialog.dart';
+import 'income_loss_edit_dialog.dart';
+import 'other_income_dialog.dart';
+import 'tcs_tds_dialog.dart';
 
 class TaxPlannerCardsScreen extends StatefulWidget {
   const TaxPlannerCardsScreen({super.key});
@@ -91,48 +97,174 @@ class _TaxPlannerCardsScreenState
               physics: const NeverScrollableScrollPhysics(),
               children: [
 
-                /// ✅ SEC 80C (PROVIDER BASED)
+                /// ✅ SEC 80C
                 _TaxCard(
                   title: "Sec 80C",
                   value:
                       "Declared: ₹${tax.sec80c.toStringAsFixed(0)} / 150000",
                   onEdit: () async {
-                    final result = await showDialog<double>(
+
+                    final result =
+                        await showDialog<Map<String, dynamic>>(
                       context: context,
                       barrierDismissible: false,
-                      builder: (_) => const Sec80CEditDialog(),
+                      builder: (_) => Sec80CEditDialog(
+                        initialValues: tax.sec80cValues,
+                      ),
                     );
 
                     if (result != null) {
-                      context
-                          .read<TaxDeclarationModel>()
-                          .updateSec80C(result);
+                      context.read<TaxDeclarationModel>().updateSec80C(
+                        result["values"],
+                        result["total"],
+                      );
                     }
                   },
                 ),
 
-                _TaxCard(
-                  title: "Other Deductions",
-                  value: "Declared: ₹${tax.otherDeductions}",
-                ),
+          _TaxCard(
+  title: "Other Deductions",
+  value: "Declared: ₹${tax.otherDeductions.toStringAsFixed(0)}",
+  onEdit: () async {
 
-                _TaxCard(
-                  title: "House Rent Allowance",
-                  value: "Declared: ₹${tax.hra}",
-                ),
+    final result =
+        await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => OtherDeductionsDialog(
+        initialValues: tax.otherDeductionValues,
+      ),
+    );
 
-                _TaxCard(
-                  title: "Medical (80D)",
-                  value: "Declared: ₹${tax.medical80d}",
-                ),
+    if (result != null) {
+      context.read<TaxDeclarationModel>()
+          .updateOtherDeductions(
+        result["values"],
+        result["total"],
+      );
+    }
+  },
+),
 
-                _TaxCard(
-                  title: "Income / Loss",
-                  value: "Declared: ₹${tax.incomeLoss}",
-                ),
 
-                const _DashedTaxCard(title: "Other Income"),
-                const _DashedTaxCard(title: "TCS / TDS Deduction"),
+               _TaxCard(
+  title: "House Rent Allowance",
+  value: "Declared: ₹${tax.hra.toStringAsFixed(0)}",
+  onEdit: () async {
+
+    final result =
+        await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => HRAEditDialog(
+        initialValues: tax.hraValues,
+      ),
+    );
+
+    if (result != null) {
+      context.read<TaxDeclarationModel>()
+          .updateHRA(
+        result["values"],
+        result["total"],
+      );
+    }
+  },
+),
+
+
+               _TaxCard(
+  title: "Medical (80D)",
+  value: "Declared: ₹${tax.medical80d}",
+  onEdit: () async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => Medical80DDialog(
+        initialValues: tax.medicalValues,
+      ),
+    );
+
+    if (result != null) {
+      context.read<TaxDeclarationModel>()
+          .updateMedical80D(
+            result["values"],
+            result["total"],
+          );
+    }
+  },
+),
+
+               _TaxCard(
+  title: "Income / Loss",
+  value: "Declared: ₹${tax.incomeLoss}",
+  onEdit: () async {
+    final result =
+        await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => IncomeLossEditDialog(
+        initialValues: tax.incomeLossValues,
+      ),
+    );
+
+    if (result != null) {
+      context
+          .read<TaxDeclarationModel>()
+          .updateIncomeLoss(
+            result["values"],
+            result["total"],
+          );
+    }
+  },
+),
+
+
+             _TaxCard(
+  title: "Other Income",
+  value: "Declared: ₹${tax.otherIncome.toStringAsFixed(0)}",
+  onEdit: () async {
+
+    final result =
+        await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => OtherIncomeDialog(
+        initialValues: tax.otherIncomeValues,
+      ),
+    );
+
+    if (result != null) {
+      context.read<TaxDeclarationModel>()
+          .updateOtherIncome(
+        result["values"],
+        result["total"],
+      );
+    }
+  },
+),
+_TaxCard(
+  title: "TCS / TDS Deduction",
+  value: "Declared: ₹${tax.tcsTds.toStringAsFixed(0)}",
+  onEdit: () async {
+
+    final result =
+        await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => TCSTDSDialog(
+        initialValues: tax.tcsTdsValues,
+      ),
+    );
+
+    if (result != null) {
+      context.read<TaxDeclarationModel>()
+    .updateTcsTds(
+      result["values"],
+      result["total"],
+);
+
+    }
+  },
+),
+
+
               ],
             ),
           ],

@@ -87,7 +87,10 @@ class _ITDeclarationScreenState extends State<ITDeclarationScreen> {
             ),
             const SizedBox(height: 12),
 
-            /// ✅ NOW ALL VALUES COME FROM PROVIDER
+            /// =========================
+            /// ALL VALUES FROM PROVIDER
+            /// =========================
+
             _card(
               "Section 80C (max limit 1.5 lakh)",
               "Declared: ₹${tax.sec80c.toStringAsFixed(0)} / 150000",
@@ -95,32 +98,32 @@ class _ITDeclarationScreenState extends State<ITDeclarationScreen> {
 
             _card(
               "Other Chapter VI-A Deductions",
-              "Declared amount ₹ ${tax.otherDeductions}",
+              "Declared amount ₹ ${tax.otherDeductions.toStringAsFixed(0)}",
             ),
 
             _card(
               "House Rent Allowance",
-              "Declared amount ₹ ${tax.hra}",
+              "Declared amount ₹ ${tax.hra.toStringAsFixed(0)}",
             ),
 
             _card(
               "Medical (Sec 80D)",
-              "Declared amount ₹ ${tax.medical80d}",
+              "Declared amount ₹ ${tax.medical80d.toStringAsFixed(0)}",
             ),
 
             _card(
               "Income / Loss from House Property",
-              "Declared amount ₹ ${tax.incomeLoss}",
+              "Declared amount ₹ ${tax.incomeLoss.toStringAsFixed(0)}",
             ),
 
             _card(
               "Other Income",
-              "Declared amount ₹ ${tax.otherIncome}",
+              "Declared amount ₹ ${tax.otherIncome.toStringAsFixed(0)}",
             ),
 
             _card(
               "TCS / TDS Deduction",
-              "Declared amount ₹ ${tax.tcsTds}",
+              "Declared amount ₹ ${tax.tcsTds.toStringAsFixed(0)}",
             ),
           ],
         ),
@@ -135,6 +138,12 @@ class _ITDeclarationScreenState extends State<ITDeclarationScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 3,
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +159,10 @@ class _ITDeclarationScreenState extends State<ITDeclarationScreen> {
           ),
           Text(
             amount,
-            style: const TextStyle(color: Colors.grey),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),

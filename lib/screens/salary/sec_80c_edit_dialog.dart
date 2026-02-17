@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Sec80CEditDialog extends StatefulWidget {
-  const Sec80CEditDialog({super.key});
+  final Map<String, double> initialValues;
+
+  const Sec80CEditDialog({
+    super.key,
+    required this.initialValues,
+  });
 
   @override
   State<Sec80CEditDialog> createState() =>
@@ -9,6 +14,29 @@ class Sec80CEditDialog extends StatefulWidget {
 }
 
 class _Sec80CEditDialogState extends State<Sec80CEditDialog> {
+
+  /// 🔥 LABEL MAP (Readable names)
+  final Map<String, String> labelMap = {
+    "fd": "5 Years Fixed Deposit",
+    "tuition": "Children Tuition Fees",
+    "pension": "Contribution to Pension Fund",
+    "nsc": "Deposit in NSC",
+    "nss": "Deposit in NSS",
+    "postOffice": "Post Office Savings Schemes",
+    "elss": "Equity Linked Savings Scheme (ELSS)",
+    "nscInterest": "Interest on NSC Reinvested",
+    "insurance": "Life Insurance Premium",
+    "infraBonds": "Long Term Infrastructure Bonds",
+    "mutualFunds": "Mutual Funds",
+    "nabard": "NABARD Rural Bonds",
+    "nps": "National Pension Scheme",
+    "nhb": "NHB Scheme",
+    "timeDeposit": "Post Office Time Deposit (5 Years)",
+    "pmInsurance": "Pradhan Mantri Suraksha Bima Yojana",
+    "ppf": "Public Provident Fund",
+    "housingLoan": "Housing Loan Principal",
+  };
+
   final Map<String, TextEditingController> controllers = {
     "fd": TextEditingController(),
     "tuition": TextEditingController(),
@@ -29,6 +57,28 @@ class _Sec80CEditDialogState extends State<Sec80CEditDialog> {
     "ppf": TextEditingController(),
     "housingLoan": TextEditingController(),
   };
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// Prefill previous values
+    controllers.forEach((key, controller) {
+      if (widget.initialValues.containsKey(key)) {
+        controller.text =
+            widget.initialValues[key]!.toString();
+      }
+    });
+  }
+
+  Map<String, double> _getValues() {
+    final Map<String, double> values = {};
+    for (final entry in controllers.entries) {
+      values[entry.key] =
+          double.tryParse(entry.value.text) ?? 0;
+    }
+    return values;
+  }
 
   double _calculateTotal() {
     double total = 0;
@@ -72,7 +122,8 @@ class _Sec80CEditDialogState extends State<Sec80CEditDialog> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () =>
+                        Navigator.pop(context),
                   )
                 ],
               ),
@@ -87,87 +138,12 @@ class _Sec80CEditDialogState extends State<Sec80CEditDialog> {
                 child: Wrap(
                   spacing: 16,
                   runSpacing: 16,
-                  children: [
-                    _AmountField(
-                      label:
-                          "5 Years of Fixed Deposit in Scheduled Bank",
-                      controller: controllers["fd"]!,
-                    ),
-                    _AmountField(
-                      label: "Children Tuition Fees",
-                      controller: controllers["tuition"]!,
-                    ),
-                    _AmountField(
-                      label: "Contribution to Pension Fund",
-                      controller: controllers["pension"]!,
-                    ),
-                    _AmountField(
-                      label: "Deposit in NSC",
-                      controller: controllers["nsc"]!,
-                    ),
-                    _AmountField(
-                      label: "Deposit in NSS",
-                      controller: controllers["nss"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Deposit in Post Office Savings Schemes",
-                      controller: controllers["postOffice"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Equity Linked Savings Scheme (ELSS)",
-                      controller: controllers["elss"]!,
-                    ),
-                    _AmountField(
-                      label: "Interest on NSC Reinvested",
-                      controller: controllers["nscInterest"]!,
-                    ),
-                    _AmountField(
-                      label: "Life Insurance Premium",
-                      controller: controllers["insurance"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Long term Infrastructure Bonds",
-                      controller: controllers["infraBonds"]!,
-                    ),
-                    _AmountField(
-                      label: "Mutual Funds",
-                      controller: controllers["mutualFunds"]!,
-                    ),
-                    _AmountField(
-                      label: "NABARD Rural Bonds",
-                      controller: controllers["nabard"]!,
-                    ),
-                    _AmountField(
-                      label: "National Pension Scheme",
-                      controller: controllers["nps"]!,
-                    ),
-                    _AmountField(
-                      label: "NHB Scheme",
-                      controller: controllers["nhb"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Post office time deposit for 5 years",
-                      controller: controllers["timeDeposit"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Pradhan Mantri Suraksha Bima Yojana",
-                      controller: controllers["pmInsurance"]!,
-                    ),
-                    _AmountField(
-                      label: "Public Provident Fund",
-                      controller: controllers["ppf"]!,
-                    ),
-                    _AmountField(
-                      label:
-                          "Repayment of Housing loan (Principal amount)",
-                      controller: controllers["housingLoan"]!,
-                    ),
-                  ],
+                  children: labelMap.entries.map((entry) {
+                    return _AmountField(
+                      label: entry.value,
+                      controller: controllers[entry.key]!,
+                    );
+                  }).toList(),
                 ),
               ),
             ),
@@ -187,8 +163,13 @@ class _Sec80CEditDialogState extends State<Sec80CEditDialog> {
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: () {
+                      final values = _getValues();
                       final total = _calculateTotal();
-                      Navigator.pop(context, total);
+
+                      Navigator.pop(context, {
+                        "values": values,
+                        "total": total,
+                      });
                     },
                     child: const Text("Update"),
                   ),
