@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'leave_api_service.dart';
+import '../../services/leave_api_service.dart';
 
 class PendingLeaveScreen extends StatelessWidget {
   const PendingLeaveScreen({super.key});
@@ -13,14 +13,14 @@ class PendingLeaveScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       backgroundColor: const Color(0xFFF6F8FB),
-      body: FutureBuilder(
-        future: LeaveApiService.getPendingLeaves(1),
+      body: FutureBuilder<List<dynamic>>(
+        future: LeaveApiService.getPendingLeaves(), // ✅ FIXED
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final leaves = snapshot.data as List;
+          final leaves = snapshot.data ?? [];
 
           if (leaves.isEmpty) {
             return const Center(child: Text("No pending leaves"));
@@ -32,9 +32,9 @@ class PendingLeaveScreen extends StatelessWidget {
             itemBuilder: (_, i) {
               final l = leaves[i];
               return _card(
-                title: l['leave_type'],
+                title: l['leave_type'] ?? '',
                 subtitle: "${l['start_date']} → ${l['end_date']}",
-                status: l['status_name'],
+                status: l['status_name'] ?? '',
               );
             },
           );
@@ -43,11 +43,18 @@ class PendingLeaveScreen extends StatelessWidget {
     );
   }
 
-  Widget _card({required String title, required String subtitle, required String status}) {
+  Widget _card({
+    required String title,
+    required String subtitle,
+    required String status,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,7 +62,10 @@ class PendingLeaveScreen extends StatelessWidget {
           const SizedBox(height: 4),
           Text(subtitle),
           const SizedBox(height: 6),
-          Chip(label: Text(status), backgroundColor: Colors.orange.shade100),
+          Chip(
+            label: Text(status),
+            backgroundColor: Colors.orange.shade100,
+          ),
         ],
       ),
     );
