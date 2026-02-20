@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../common/widgets/section_title.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 
 class EmployeeBasicDetails extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -10,11 +13,38 @@ class EmployeeBasicDetails extends StatefulWidget {
   });
 
   @override
-  State<EmployeeBasicDetails> createState() => _EmployeeBasicDetailsState();
+  State<EmployeeBasicDetails> createState() => EmployeeBasicDetailsState();
 }
 
-class _EmployeeBasicDetailsState extends State<EmployeeBasicDetails> {
-  String? _selectedBloodGroup;
+class EmployeeBasicDetailsState extends State<EmployeeBasicDetails> {
+  int? _selectedBloodGroup;
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+
+
+  Future<void> _pickImage() async {
+  final picked = await _picker.pickImage(source: ImageSource.gallery);
+
+  if (picked != null) {
+    setState(() {
+      _imageFile = File(picked.path);
+    });
+
+    widget.formData["upload_doc"] = picked.path;
+  }
+}
+
+
+
+    String? _serverEmpIdError;
+
+    void setServerEmpIdError(String? message) {
+      setState(() {
+        _serverEmpIdError = message;
+      });
+    }
+
 
   @override
   Widget build(BuildContext context) {
@@ -28,25 +58,45 @@ class _EmployeeBasicDetailsState extends State<EmployeeBasicDetails> {
         Center(
           child: Column(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 48,
-                backgroundColor: Color(0xFF8BCF6A),
-                child: Text(
-                  "U",
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                backgroundColor: const Color(0xFF8BCF6A),
+                backgroundImage:
+                    _imageFile != null ? FileImage(_imageFile!) : null,
+                child: _imageFile == null
+                    ? const Text(
+                        "U",
+                        style: TextStyle(
+                          fontSize: 28,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null,
               ),
+
               const SizedBox(height: 10),
+              // OutlinedButton.icon
+              // (
+              //   onPressed: () {
+              //    
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //       const SnackBar(
+              //         content: Text("Photo upload - Add image_picker package"),
+              //       ),
+              //     );
+              //   },
+              //   icon: const Icon(Icons.upload),
+              //   label: const Text("Upload Photo"),
+              // ),
+
               OutlinedButton.icon(
-                onPressed: () {
-                },
-                icon: const Icon(Icons.upload),
-                label: const Text("Upload Photo"),
-              ),
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.upload),
+                  label: const Text("Upload Photo"),
+                ),
+
+
             ],
           ),
         ),
@@ -55,12 +105,13 @@ class _EmployeeBasicDetailsState extends State<EmployeeBasicDetails> {
 
         /// ================= EMPLOYEE ID =================
         TextFormField(
-          decoration: const InputDecoration(
-            labelText: "Employee ID *",
-          ),
-          validator: (v) =>
-              v == null || v.isEmpty ? "Employee ID required" : null,
-          onSaved: (v) => widget.formData["emp_code"] = v,
+            decoration: InputDecoration(
+              labelText: "Employee ID *",
+              errorText: _serverEmpIdError,
+            ),
+            onChanged: (v) {
+              setState(() => _serverEmpIdError = null);
+            },
         ),
 
         const SizedBox(height: 16),
@@ -102,28 +153,30 @@ class _EmployeeBasicDetailsState extends State<EmployeeBasicDetails> {
         const SizedBox(height: 16),
 
         /// ================= BLOOD GROUP =================
-        DropdownButtonFormField<String>(
+        DropdownButtonFormField<int>(
           initialValue: _selectedBloodGroup,
           decoration: const InputDecoration(
             labelText: "Blood Group *",
           ),
           items: const [
-            DropdownMenuItem(value: "A+", child: Text("A+")),
-            DropdownMenuItem(value: "A-", child: Text("A-")),
-            DropdownMenuItem(value: "B+", child: Text("B+")),
-            DropdownMenuItem(value: "B-", child: Text("B-")),
-            DropdownMenuItem(value: "AB+", child: Text("AB+")),
-            DropdownMenuItem(value: "AB-", child: Text("AB-")),
-            DropdownMenuItem(value: "O+", child: Text("O+")),
+            DropdownMenuItem(value: 1, child: Text("A+")),
+            DropdownMenuItem(value: 2, child: Text("A-")),
+            DropdownMenuItem(value: 3, child: Text("B+")),
+            DropdownMenuItem(value: 4, child: Text("B-")),
+            DropdownMenuItem(value: 5, child: Text("AB+")),
+            DropdownMenuItem(value: 6, child: Text("AB-")),
+            DropdownMenuItem(value: 7, child: Text("O+")),
+            DropdownMenuItem(value: 8, child: Text("O-")),
           ],
           validator: (v) => v == null ? "Blood group required" : null,
           onChanged: (v) {
             setState(() {
               _selectedBloodGroup = v;
             });
+            widget.formData["blood_group_id"] = v;
           },
           onSaved: (v) {
-            widget.formData["blood_group"] = v;
+            widget.formData["blood_group_id"] = v;
           },
         ),
       ],

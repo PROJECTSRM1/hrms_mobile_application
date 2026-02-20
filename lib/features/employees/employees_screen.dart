@@ -28,17 +28,21 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
   }
 
   Future<void> loadEmployees() async {
-    try {
-      final data = await EmployeeService.fetchEmployees();
-      setState(() {
-        employees = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      debugPrint("Employee Load Error: $e");
-      setState(() => isLoading = false);
-    }
+  try {
+    final data = await EmployeeService.fetchEmployees();
+
+    data.sort((a, b) => int.parse(b.id).compareTo(int.parse(a.id)));
+
+    setState(() {
+      employees = data;
+      isLoading = false;
+    });
+  } catch (e) {
+    debugPrint("Employee Load Error: $e");
+    setState(() => isLoading = false);
   }
+}
+
 
   /// ================= FILTER =================
   List<Employee> get filteredEmployees {
@@ -185,6 +189,8 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               MaterialPageRoute(
                 builder: (_) =>
                     EmployeeDetailsScreen(employeeId: emp.id)
+                        // EmployeeDetailsScreen(employeeId: e.id),
+
               ),
             );
           },
@@ -217,7 +223,9 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (_) =>
-                      EmployeeDetailsScreen(employeeId: e.empId),
+                      // EmployeeDetailsScreen(employeeId: e.empId),
+                      EmployeeDetailsScreen(employeeId: e.id),
+
                 ),
               );
             },

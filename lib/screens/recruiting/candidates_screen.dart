@@ -277,7 +277,10 @@ Future<void> _loadData() async {
                                   content: Text('Resume uploaded successfully')),
                             );
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+
+                            if (!mounted) return;
+
+                            ScaffoldMessenger.of(this.context).showSnackBar(
                               SnackBar(content: Text('Upload failed: $e')),
                             );
                           }
