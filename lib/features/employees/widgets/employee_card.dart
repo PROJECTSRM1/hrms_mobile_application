@@ -22,7 +22,10 @@ class EmployeeCard extends StatelessWidget {
           backgroundColor: Color(0xFFE7E3FF),
           child: Icon(Icons.person, color: Colors.deepPurple),
         ),
-        title: Text(employee.name),
+        title: Text(
+          employee.name,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         subtitle: Text("EMP ID: ${employee.empId}"),
         trailing: Text(
           employee.isActive ? "Active" : "Inactive",
